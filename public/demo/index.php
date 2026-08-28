@@ -1,0 +1,1 @@
+<?php header("Location: https://demo.eduvixo.com/?IdRef=eduvixo.com"); exit; ?>
