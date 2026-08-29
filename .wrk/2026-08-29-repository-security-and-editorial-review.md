@@ -75,4 +75,47 @@ Post-rewrite checks on `main`:
 - zero Gitleaks findings;
 - no ignored local credentials, `.cms/`, `.doc/`, private package storage or release artifacts in the Git index.
 
-The remote update and credential-rotation results are appended after their independent verification.
+## Remote publication
+
+The rewritten `main` branch was force-updated with an exact lease against the previously verified remote commit `dd5379e913257b6a86caf077495a837c07130cab`. The first published security-documentation commit was `f48cdc5c571fb67eeaa92e7e2182d71e57d7e793`. The local and remote heads matched after publication.
+
+GitHub verification confirmed:
+
+- only `refs/heads/main` exists;
+- zero forks and zero pull requests;
+- `.cfg/README.md` is present;
+- credential files and historical public ZIP paths return HTTP 404 through the repository Contents API;
+- the old commit is unreachable from every repository ref, although GitHub may continue to serve unreachable objects by exact SHA until server-side garbage collection.
+
+GitHub documents Support-assisted cache removal for sensitive-data rewrites. Because all exposed credentials were revoked or rotated and the repository has no forks or pull requests, the cached object no longer grants active access. A Support request can still cite repository `ChivaleGroup/eduvixo-cms`, zero affected pull requests, and first changed commit mapping `d2f00a65fcf380069616f09a4267664248212b4d` → `85a05b4226df9f7d78a8f23a86c9a964dd590f81` if immediate cache collection is required.
+
+## Credential rotation
+
+All active secrets found in the former public history were rotated without changing public service identities:
+
+- root SSH password;
+- two independent SFTP account passwords;
+- two independent FTP account passwords;
+- MySQL application password, updated atomically in the demo `.env`;
+- PostgreSQL role password;
+- SMTP/IMAP mailbox password on the dedicated mail server;
+- Eduvixo product license key in the Chivale license service and encrypted demo installation.
+
+The local ignored `.cfg/` files were updated with the new values. No secret value is recorded in Git, documentation, command output or logs.
+
+Rollback material:
+
+- primary server account/database backup: `/root/eduvixo-backups/credential-rotation-20260829-1715/`;
+- mailbox database row: `/root/eduvixo-credential-backup-20260829-1725/mail-user.sql` on the mail server;
+- license-service database row: `/root/eduvixo-license-backup-20260829-1740.sql` on the Chivale server;
+- demo encrypted license state: `/root/eduvixo-backups/license-rotation-pre-20260829-1740.tar.gz`.
+
+Each credential was tested through its real protocol after rotation. An additional value-based audit against the pre-rewrite bundle confirmed that the eight former infrastructure/mail passwords no longer match the active server hashes or authenticate to their database services. The old product license returns an invalid-license response, while the new key validates and the demo returns HTTP 200.
+
+## Recurrence prevention
+
+- `.gitignore` denies local configuration, CMS sources, working documents, private packages, releases, dumps, licenses and common private-key formats;
+- only `.cfg/README.md` can be tracked from the configuration directory;
+- `.github/workflows/security.yml` runs Gitleaks on every `main` push and pull request;
+- the workflow downloads a fixed Gitleaks version, verifies its published SHA-256 and pins `actions/checkout` to an exact commit;
+- the final local scan and exact-value scan must remain clean before publication.
