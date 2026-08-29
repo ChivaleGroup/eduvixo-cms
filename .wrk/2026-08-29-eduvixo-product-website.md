@@ -141,6 +141,6 @@ Demo rollback:
 - PHP-FPM reloaded after demo login configuration validation
 - no DNS, firewall, SSL or container changes
 
-## Security follow-up
+## Repository security resolution
 
-Credential files under `.cfg/` are currently already tracked by Git. Ignoring `.cfg/*` prevents newly untracked files from being added, but does not remove existing secrets from Git history. Rotate exposed credentials and purge them from repository history in a separately planned security change; do not perform this as an incidental website commit.
+The public Git history was rewritten on 2026-08-29 to remove all `.cfg/` content and historical release archives. Local credentials, CMS distribution sources, working documents, private packages and deployment artifacts are now excluded by deny-by-default ignore rules. Details, rollback information and verification results are recorded in `.wrk/2026-08-29-repository-security-and-editorial-review.md`.

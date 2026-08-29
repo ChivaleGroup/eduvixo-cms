@@ -215,4 +215,4 @@ Rollback consists of restoring the relevant archive into the matching web root, 
 - Search visibility also depends on original content, editorial quality, authority/backlinks, performance and ongoing updates; metadata alone cannot guarantee ranking.
 - All non-English translations should receive native-speaker editorial review before paid acquisition campaigns.
 - The one-hour IP lock intentionally limits impact on institutions sharing a public address; it is not permanent. Distributed attacks remain a wider infrastructure/WAF concern.
-- Credentials already tracked under `.cfg/` remain a separate repository-history risk and should be rotated/purged in a dedicated security operation.
+- The previously tracked `.cfg/` credentials and public package archives were removed from the complete Git history on 2026-08-29. The rewrite, rollback bundle and exact-value verification are documented in `.wrk/2026-08-29-repository-security-and-editorial-review.md`.

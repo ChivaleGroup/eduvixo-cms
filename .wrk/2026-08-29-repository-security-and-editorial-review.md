@@ -56,4 +56,23 @@ Rollback: extract the backup archive into `/var/www/clients/client9/web120/web`,
 
 ## Git history rewrite and credential rotation
 
-Final commit identifiers, bundle location, push verification, secret-scan results and credential-rotation outcomes are recorded below after execution.
+The pre-rewrite repository, including every local ref, was saved as:
+
+- bundle: `F:\Git\ChivaleGroup\eduvixo-cms-security-rollback-20260829-1706.bundle`
+- SHA-256: `90D3D0771EBD4D7851C13AC3B725480A38CE863CDEC383A2991D1F3C815CADA9`
+- previous remote `main`: `dd5379e913257b6a86caf077495a837c07130cab`
+- pre-rewrite website commit: `b167dd8ba5e907e4f3665a751cd9b0184378175c`
+
+The bundle passed `git bundle verify`. It contains compromised historical material and is for local emergency rollback only; it must not be uploaded or shared.
+
+`git-filter-repo` removed `.cfg/`, the historical CMS installation archive and all historical Marketplace ZIP/checksum artifacts from the complete `main` history. The first sanitized website commit is `74959e1b0b0f45e801559c7eec493c5b17ece393`.
+
+Post-rewrite checks on `main`:
+
+- nine reachable commits;
+- zero `.cfg/` or historical public ZIP paths;
+- zero matches for all known exposed credential and license values;
+- zero Gitleaks findings;
+- no ignored local credentials, `.cms/`, `.doc/`, private package storage or release artifacts in the Git index.
+
+The remote update and credential-rotation results are appended after their independent verification.
