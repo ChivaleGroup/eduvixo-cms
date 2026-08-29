@@ -1,9 +1,11 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Net;
 using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Controls;
+using System.Windows.Media.Imaging;
 using Microsoft.Web.WebView2.Core;
 using Eduvixo.Windows.Models;
 using Eduvixo.Windows.Services;
@@ -16,11 +18,14 @@ public partial class MainWindow : Window
     private static readonly Uri WebsiteUri = new("https://www.eduvixo.com/");
     private static readonly Uri WebViewRuntimeUri = new("https://developer.microsoft.com/microsoft-edge/webview2/");
 
+    private readonly LoginSessionService _loginSession = new();
     private AppSettings _settings;
     private string _language;
     private bool _initializingUi = true;
     private bool _browserInitialized;
     private bool _runtimeMissing;
+    private bool _captchaEnabled;
+    private CancellationTokenSource? _loginCancellation;
 
     public MainWindow()
     {
@@ -44,7 +49,7 @@ public partial class MainWindow : Window
     {
         if (_settings.RememberChoice && string.Equals(_settings.Mode, "online", StringComparison.Ordinal))
         {
-            await ShowBrowserAsync();
+            await ShowLoginAsync();
         }
         else
         {
@@ -70,6 +75,20 @@ public partial class MainWindow : Window
         BrowserWebsiteButton.Content = LocalizationService.Get("officialWebsite");
         LoadingText.Text = LocalizationService.Get("loading");
         ErrorLauncherButton.Content = LocalizationService.Get("backToStart");
+        LoginBackButton.Content = $"← {LocalizationService.Get("backToStart")}";
+        LoginWebsiteButton.Content = LocalizationService.Get("officialWebsite");
+        LoginEyebrow.Text = LocalizationService.Get("loginEyebrow");
+        LoginBrandTitle.Text = LocalizationService.Get("loginBrandTitle");
+        LoginBrandDescription.Text = LocalizationService.Get("loginBrandDescription");
+        SecureConnectionText.Text = LocalizationService.Get("secureConnection");
+        LoginTitle.Text = LocalizationService.Get("loginTitle");
+        LoginSubtitle.Text = LocalizationService.Get("loginSubtitle");
+        EmailLabel.Text = LocalizationService.Get("emailLabel");
+        PasswordLabel.Text = LocalizationService.Get("passwordLabel");
+        CaptchaLabel.Text = LocalizationService.Get("captchaLabel");
+        RefreshCaptchaButton.Content = LocalizationService.Get("refreshCaptcha");
+        DemoAccessNote.Text = LocalizationService.Get("demoAccessNote");
+        LoginSubmitButton.Content = LocalizationService.Get("signIn");
         LauncherButton.ToolTip = LocalizationService.Get("backToStart");
         BackButton.ToolTip = LocalizationService.Get("back");
         ForwardButton.ToolTip = LocalizationService.Get("forward");
@@ -80,6 +99,9 @@ public partial class MainWindow : Window
         AutomationProperties.SetHelpText(OnlineButton, LocalizationService.Get("onlineDescription"));
         AutomationProperties.SetName(OfflineButton, LocalizationService.Get("offlineTitle"));
         AutomationProperties.SetHelpText(OfflineButton, LocalizationService.Get("offlineUnavailable"));
+        AutomationProperties.SetName(LoginEmailTextBox, LocalizationService.Get("emailLabel"));
+        AutomationProperties.SetName(LoginPasswordBox, LocalizationService.Get("passwordLabel"));
+        AutomationProperties.SetName(CaptchaTextBox, LocalizationService.Get("captchaLabel"));
 
         if (ErrorOverlay.Visibility == Visibility.Visible)
         {
@@ -122,11 +144,61 @@ public partial class MainWindow : Window
         var remember = RememberChoiceCheckBox.IsChecked == true;
         _settings = new AppSettings(_language, remember, remember ? "online" : null);
         SettingsStore.Save(_settings);
-        await ShowBrowserAsync();
+        await ShowLoginAsync();
     }
 
-    private async Task ShowBrowserAsync()
+    private async Task ShowLoginAsync(bool sessionExpired = false)
     {
+        StartView.Visibility = Visibility.Collapsed;
+        BrowserView.Visibility = Visibility.Collapsed;
+        LoginView.Visibility = Visibility.Visible;
+        SetLoginBusy(true);
+        LoginStatusText.Text = sessionExpired
+            ? LocalizationService.Get("sessionExpired")
+            : LocalizationService.Get("preparingLogin");
+
+        _loginCancellation?.Cancel();
+        _loginCancellation?.Dispose();
+        _loginCancellation = new CancellationTokenSource();
+
+        try
+        {
+            var bootstrap = await _loginSession.PrepareAsync(_language, _loginCancellation.Token);
+            LoginEmailTextBox.Text = bootstrap.Email;
+            LoginPasswordBox.Password = bootstrap.Password;
+            _captchaEnabled = bootstrap.CaptchaEnabled;
+            CaptchaPanel.Visibility = _captchaEnabled ? Visibility.Visible : Visibility.Collapsed;
+            CaptchaLabel.Visibility = _captchaEnabled ? Visibility.Visible : Visibility.Collapsed;
+            if (bootstrap.CaptchaImage is not null)
+            {
+                CaptchaImage.Source = CreateImage(bootstrap.CaptchaImage);
+            }
+
+            CaptchaTextBox.Clear();
+            LoginStatusText.Text = sessionExpired ? LocalizationService.Get("sessionExpired") : string.Empty;
+            SetLoginBusy(false);
+            if (_captchaEnabled)
+            {
+                _ = Dispatcher.BeginInvoke(new Action(() => CaptchaTextBox.Focus()));
+            }
+            else
+            {
+                LoginSubmitButton.Focus();
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch
+        {
+            LoginStatusText.Text = LocalizationService.Get("loginConnectionError");
+            SetLoginBusy(false);
+        }
+    }
+
+    private async Task ShowAuthenticatedBrowserAsync()
+    {
+        LoginView.Visibility = Visibility.Collapsed;
         StartView.Visibility = Visibility.Collapsed;
         BrowserView.Visibility = Visibility.Visible;
         ErrorOverlay.Visibility = Visibility.Collapsed;
@@ -134,14 +206,17 @@ public partial class MainWindow : Window
 
         if (!_browserInitialized)
         {
-            await InitializeBrowserAsync();
-            return;
+            if (!await InitializeBrowserAsync())
+            {
+                return;
+            }
         }
 
+        ImportSessionCookies();
         Browser.CoreWebView2.Navigate(DashboardUri.AbsoluteUri);
     }
 
-    private async Task InitializeBrowserAsync()
+    private async Task<bool> InitializeBrowserAsync()
     {
         try
         {
@@ -173,15 +248,17 @@ public partial class MainWindow : Window
             Browser.CoreWebView2.ProcessFailed += Browser_ProcessFailed;
 
             _browserInitialized = true;
-            Browser.CoreWebView2.Navigate(DashboardUri.AbsoluteUri);
+            return true;
         }
         catch (WebView2RuntimeNotFoundException)
         {
             ShowError(true);
+            return false;
         }
         catch
         {
             ShowError(false);
+            return false;
         }
     }
 
@@ -196,6 +273,13 @@ public partial class MainWindow : Window
 
         if (uri.Scheme == "about" || IsEduvixoUri(uri))
         {
+            if (IsLoginUri(uri))
+            {
+                e.Cancel = true;
+                _ = Dispatcher.InvokeAsync(async () => await ShowLoginAsync(true));
+                return;
+            }
+
             LoadingOverlay.Visibility = Visibility.Visible;
             ErrorOverlay.Visibility = Visibility.Collapsed;
             return;
@@ -287,6 +371,24 @@ public partial class MainWindow : Window
                || uri.Host.EndsWith(".eduvixo.com", StringComparison.OrdinalIgnoreCase);
     }
 
+    private static bool IsLoginUri(Uri uri) =>
+        IsEduvixoUri(uri) && uri.AbsolutePath.TrimEnd('/').Equals("/login", StringComparison.OrdinalIgnoreCase);
+
+    private void ImportSessionCookies()
+    {
+        foreach (Cookie cookie in _loginSession.SessionCookies())
+        {
+            var webCookie = Browser.CoreWebView2.CookieManager.CreateCookie(
+                cookie.Name,
+                cookie.Value,
+                cookie.Domain.TrimStart('.'),
+                string.IsNullOrWhiteSpace(cookie.Path) ? "/" : cookie.Path);
+            webCookie.IsHttpOnly = cookie.HttpOnly;
+            webCookie.IsSecure = cookie.Secure;
+            Browser.CoreWebView2.CookieManager.AddOrUpdateCookie(webCookie);
+        }
+    }
+
     private static void OpenExternal(Uri uri)
     {
         try
@@ -301,8 +403,123 @@ public partial class MainWindow : Window
     private void LauncherButton_Click(object sender, RoutedEventArgs e)
     {
         BrowserView.Visibility = Visibility.Collapsed;
+        LoginView.Visibility = Visibility.Collapsed;
         StartView.Visibility = Visibility.Visible;
         OnlineButton.Focus();
+    }
+
+    private void LoginBackButton_Click(object sender, RoutedEventArgs e)
+    {
+        _loginCancellation?.Cancel();
+        LoginView.Visibility = Visibility.Collapsed;
+        StartView.Visibility = Visibility.Visible;
+        OnlineButton.Focus();
+    }
+
+    private async void RefreshCaptchaButton_Click(object sender, RoutedEventArgs e)
+    {
+        await RefreshCaptchaAsync();
+    }
+
+    private async Task RefreshCaptchaAsync()
+    {
+        if (!_captchaEnabled)
+        {
+            return;
+        }
+
+        RefreshCaptchaButton.IsEnabled = false;
+        try
+        {
+            var image = await _loginSession.RefreshCaptchaAsync();
+            CaptchaImage.Source = CreateImage(image);
+            CaptchaTextBox.Clear();
+            CaptchaTextBox.Focus();
+        }
+        catch
+        {
+            LoginStatusText.Text = LocalizationService.Get("loginConnectionError");
+        }
+        finally
+        {
+            RefreshCaptchaButton.IsEnabled = true;
+        }
+    }
+
+    private async void LoginSubmitButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (string.IsNullOrWhiteSpace(LoginEmailTextBox.Text)
+            || string.IsNullOrEmpty(LoginPasswordBox.Password)
+            || (_captchaEnabled && string.IsNullOrWhiteSpace(CaptchaTextBox.Text)))
+        {
+            LoginStatusText.Text = LocalizationService.Get("completeLoginFields");
+            return;
+        }
+
+        SetLoginBusy(true);
+        LoginStatusText.Text = LocalizationService.Get("signingIn");
+        try
+        {
+            var result = await _loginSession.LoginAsync(
+                LoginEmailTextBox.Text,
+                LoginPasswordBox.Password,
+                _captchaEnabled ? CaptchaTextBox.Text : string.Empty);
+            if (!result.Ok)
+            {
+                LoginStatusText.Text = LocalizeLoginError(result.Message);
+                SetLoginBusy(false);
+                await RefreshCaptchaAsync();
+                return;
+            }
+
+            await ShowAuthenticatedBrowserAsync();
+        }
+        catch
+        {
+            LoginStatusText.Text = LocalizationService.Get("loginConnectionError");
+            SetLoginBusy(false);
+        }
+    }
+
+    private static BitmapImage CreateImage(byte[] bytes)
+    {
+        using var stream = new MemoryStream(bytes);
+        var image = new BitmapImage();
+        image.BeginInit();
+        image.CacheOption = BitmapCacheOption.OnLoad;
+        image.StreamSource = stream;
+        image.EndInit();
+        image.Freeze();
+        return image;
+    }
+
+    private void SetLoginBusy(bool busy)
+    {
+        LoginEmailTextBox.IsEnabled = !busy;
+        LoginPasswordBox.IsEnabled = !busy;
+        CaptchaTextBox.IsEnabled = !busy;
+        RefreshCaptchaButton.IsEnabled = !busy;
+        LoginSubmitButton.IsEnabled = !busy;
+    }
+
+    private static string LocalizeLoginError(string message)
+    {
+        if (message.Contains("security session", StringComparison.OrdinalIgnoreCase))
+        {
+            return LocalizationService.Get("securitySessionExpired");
+        }
+
+        if (message.Contains("security code", StringComparison.OrdinalIgnoreCase))
+        {
+            return LocalizationService.Get("captchaIncorrect");
+        }
+
+        if (message.Contains("password", StringComparison.OrdinalIgnoreCase))
+        {
+            return LocalizationService.Get("credentialsIncorrect");
+        }
+
+        return LocalizationService.Get("loginUnexpectedError");
     }
 
     private void BackButton_Click(object sender, RoutedEventArgs e)
@@ -345,11 +562,21 @@ public partial class MainWindow : Window
         }
         else
         {
-            await InitializeBrowserAsync();
+            if (await InitializeBrowserAsync())
+            {
+                ImportSessionCookies();
+                Browser.CoreWebView2.Navigate(DashboardUri.AbsoluteUri);
+            }
         }
     }
 
     private void WebsiteButton_Click(object sender, RoutedEventArgs e) => OpenExternal(WebsiteUri);
 
-    private void Window_Closing(object? sender, CancelEventArgs e) => Browser.Dispose();
+    private void Window_Closing(object? sender, CancelEventArgs e)
+    {
+        _loginCancellation?.Cancel();
+        _loginCancellation?.Dispose();
+        _loginSession.Dispose();
+        Browser.Dispose();
+    }
 }

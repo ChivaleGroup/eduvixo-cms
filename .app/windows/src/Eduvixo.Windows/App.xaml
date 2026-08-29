@@ -54,10 +54,22 @@
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Chrome" Property="Background" Value="#0B4EBD" /></Trigger>
                             <Trigger Property="IsPressed" Value="True"><Setter TargetName="Chrome" Property="Background" Value="#083C91" /></Trigger>
+                            <Trigger Property="IsEnabled" Value="False"><Setter TargetName="Chrome" Property="Opacity" Value="0.58" /></Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+        </Style>
+
+        <Style x:Key="LoginTextBoxStyle" TargetType="Control">
+            <Setter Property="Height" Value="46" />
+            <Setter Property="Padding" Value="13,9" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Foreground" Value="#0B1735" />
+            <Setter Property="Background" Value="#F8FAFD" />
+            <Setter Property="BorderBrush" Value="#CCD9E9" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
         </Style>
     </Application.Resources>
 </Application>

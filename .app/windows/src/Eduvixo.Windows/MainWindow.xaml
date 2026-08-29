@@ -133,6 +133,89 @@
             </Grid>
         </Grid>
 
+        <Grid x:Name="LoginView" Visibility="Collapsed">
+            <Grid.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Offset="0" Color="#03112E" />
+                    <GradientStop Offset="0.58" Color="#062A67" />
+                    <GradientStop Offset="1" Color="#0A55B5" />
+                </LinearGradientBrush>
+            </Grid.Background>
+
+            <Ellipse Width="620" Height="620" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,-260,-330" Stroke="#2E72CF" StrokeThickness="1" Opacity="0.42" IsHitTestVisible="False" />
+            <Ellipse Width="440" Height="440" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,-170,-230" Stroke="#4F8CDF" StrokeThickness="1" Opacity="0.32" IsHitTestVisible="False" />
+
+            <Grid Margin="42,30,42,26">
+                <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+
+                <Grid Grid.Row="0">
+                    <Image Width="168" HorizontalAlignment="Left" Source="Assets/eduvixo-logo.png" Stretch="Uniform" />
+                    <Button x:Name="LoginBackButton" HorizontalAlignment="Right" Style="{StaticResource TextLinkStyle}" Click="LoginBackButton_Click" />
+                </Grid>
+
+                <Border Grid.Row="1" Width="880" MaxHeight="520" HorizontalAlignment="Center" VerticalAlignment="Center" Background="White" CornerRadius="26">
+                    <Border.Effect><DropShadowEffect BlurRadius="44" ShadowDepth="18" Opacity="0.25" Color="#001233" /></Border.Effect>
+                    <Grid>
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="0.88*" /><ColumnDefinition Width="1.12*" /></Grid.ColumnDefinitions>
+
+                        <Border Grid.Column="0" Padding="38" Background="#071C49" CornerRadius="26,0,0,26">
+                            <Grid>
+                                <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+                                <Border Width="58" Height="58" HorizontalAlignment="Left" Background="#123B7A" CornerRadius="17">
+                                    <Viewbox Width="29" Height="29"><Grid Width="24" Height="24"><Path Data="M7,11 V8 A5,5 0 0 1 17,8 V11 M6,11 H18 V21 H6 Z" Stroke="#8FC2FF" StrokeThickness="1.7" StrokeStartLineCap="Round" StrokeEndLineCap="Round" /><Ellipse Width="2.7" Height="2.7" Fill="#8FC2FF" /></Grid></Viewbox>
+                                </Border>
+                                <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                                    <TextBlock x:Name="LoginEyebrow" Foreground="#75A8F3" FontSize="11" FontWeight="Bold" />
+                                    <TextBlock x:Name="LoginBrandTitle" Margin="0,14,0,12" Foreground="White" FontSize="31" FontWeight="Bold" LineHeight="38" TextWrapping="Wrap" />
+                                    <TextBlock x:Name="LoginBrandDescription" Foreground="#BFD1EA" FontSize="14" LineHeight="23" TextWrapping="Wrap" />
+                                </StackPanel>
+                                <StackPanel Grid.Row="2" Orientation="Horizontal"><Ellipse Width="7" Height="7" Margin="0,0,8,0" Fill="#42C894" /><TextBlock x:Name="SecureConnectionText" Foreground="#9FB6D6" FontSize="11" /></StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <Grid Grid.Column="1" Margin="40,31,40,30">
+                            <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+                            <StackPanel>
+                                <TextBlock x:Name="LoginTitle" Foreground="#071A41" FontSize="26" FontWeight="Bold" />
+                                <TextBlock x:Name="LoginSubtitle" Margin="0,6,0,0" Foreground="#60708A" FontSize="13" TextWrapping="Wrap" />
+                            </StackPanel>
+
+                            <StackPanel Grid.Row="1" Margin="0,20,0,0">
+                                <TextBlock x:Name="EmailLabel" Margin="0,0,0,6" Foreground="#253755" FontSize="12" FontWeight="SemiBold" />
+                                <TextBox x:Name="LoginEmailTextBox" Style="{StaticResource LoginTextBoxStyle}" MaxLength="190" />
+                                <TextBlock x:Name="PasswordLabel" Margin="0,13,0,6" Foreground="#253755" FontSize="12" FontWeight="SemiBold" />
+                                <PasswordBox x:Name="LoginPasswordBox" Style="{StaticResource LoginTextBoxStyle}" MaxLength="200" />
+                                <TextBlock x:Name="CaptchaLabel" Margin="0,13,0,6" Foreground="#253755" FontSize="12" FontWeight="SemiBold" />
+                                <Grid x:Name="CaptchaPanel">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="180" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                                    <Border Width="180" Height="52" HorizontalAlignment="Left" Background="#EDF3FF" BorderBrush="#D4E2F5" BorderThickness="1" CornerRadius="9">
+                                        <Image x:Name="CaptchaImage" Width="180" Height="52" Stretch="Uniform" />
+                                    </Border>
+                                    <Grid Grid.Column="1" Margin="10,0,0,0">
+                                        <Grid.RowDefinitions><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+                                        <TextBox x:Name="CaptchaTextBox" Height="34" Padding="10,5" VerticalContentAlignment="Center" MaxLength="10" FontSize="14" CharacterCasing="Upper" BorderBrush="#CCD9E9" BorderThickness="1" />
+                                        <Button Grid.Row="1" x:Name="RefreshCaptchaButton" Margin="0,3,0,0" HorizontalAlignment="Left" Padding="0" Foreground="#145EDB" Background="Transparent" BorderThickness="0" FontSize="11" Cursor="Hand" Click="RefreshCaptchaButton_Click" />
+                                    </Grid>
+                                </Grid>
+                                <TextBlock x:Name="LoginStatusText" MinHeight="18" Margin="0,10,0,0" Foreground="#B5472D" FontSize="12" TextWrapping="Wrap" AutomationProperties.LiveSetting="Assertive" />
+                            </StackPanel>
+
+                            <Grid Grid.Row="2" Margin="0,10,0,0">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                <TextBlock x:Name="DemoAccessNote" MaxWidth="250" VerticalAlignment="Center" Foreground="#718096" FontSize="11" LineHeight="16" TextWrapping="Wrap" />
+                                <Button Grid.Column="1" x:Name="LoginSubmitButton" MinWidth="130" Style="{StaticResource PrimaryButtonStyle}" IsDefault="True" Click="LoginSubmitButton_Click" />
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <Grid Grid.Row="2">
+                    <TextBlock VerticalAlignment="Center" Foreground="#87A2C8" FontSize="11" Text="© Eduvixo &amp; QUANT Software House" />
+                    <Button x:Name="LoginWebsiteButton" HorizontalAlignment="Right" Style="{StaticResource TextLinkStyle}" Click="WebsiteButton_Click" />
+                </Grid>
+            </Grid>
+        </Grid>
+
         <Grid x:Name="BrowserView" Visibility="Collapsed" Background="White">
             <Grid.RowDefinitions><RowDefinition Height="62" /><RowDefinition Height="*" /></Grid.RowDefinitions>
             <Border Grid.Row="0" Background="#041434" BorderBrush="#17325F" BorderThickness="0,0,0,1">

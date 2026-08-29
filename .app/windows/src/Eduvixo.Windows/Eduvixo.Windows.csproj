@@ -6,7 +6,7 @@
     <AssemblyName>eduvixo</AssemblyName>
     <RootNamespace>Eduvixo.Windows</RootNamespace>
     <ApplicationIcon>app.ico</ApplicationIcon>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <Authors>Eduvixo &amp; QUANT Software House</Authors>
     <Company>Eduvixo</Company>
     <Product>Eduvixo</Product>
