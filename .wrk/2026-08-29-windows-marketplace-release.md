@@ -31,7 +31,10 @@ Both files are owned by `web120:client9` with mode `0640`. No executable was pla
 - Disabled PHP execution-time limits and cleared output buffers immediately before streaming large verified files.
 - Added explicit public-route blocking for EXE, MSI, APPX and MSIX files.
 - Added localized Windows product copy, architecture labels, compatibility, portable state, recommendation and unsigned-release notice in all seven languages.
-- Expanded the desktop Marketplace grid from three to four columns and added a responsive two-button variant layout.
+- Preserved the established three-column card proportions and placed the Windows product in a distinct full-width featured panel below them.
+- The featured panel separates product identity and metadata from a compact download surface containing both architecture variants.
+- Desktop cards are 381 x 430 px within the standard 1180 px shell; the Windows panel is 1180 x 278 px instead of a narrow vertical card.
+- Tablet and mobile breakpoints stack the featured content, and screens down to 375 CSS pixels retain full-width controls without horizontal overflow.
 
 The release is portable and unsigned. Windows may display a SmartScreen/security warning on first launch; the Marketplace states this clearly in every language.
 
@@ -67,6 +70,22 @@ Deployment archive SHA-256:
 
 `9ae1273df003f392cc8e66143da0668676ff8d67d28dac76cb10d25c4a9ada13`
 
+Marketplace layout correction backup:
+
+`/root/eduvixo-backups/marketplace-layout-pre-20260829-2258.tar.gz`
+
+Layout backup SHA-256:
+
+`a8b2918a889ae8a1e8bd49b31b57a9854623b03acefae3fc22d105323122d1e8`
+
+Marketplace layout deployment archive:
+
+`/root/eduvixo-marketplace-layout-20260829-2258.tar.gz`
+
+Layout deployment SHA-256:
+
+`7340870c7ac67dbb5b0fd39c4149f99366dc9a75d83e395da75918bd4403a974`
+
 Rollback: extract the pre-deployment backup into `/var/www/clients/client9/web120/web`, restore `web120:client9` ownership, remove only the two Windows 0.2.1 executables from private Marketplace storage, lint PHP, validate Apache, reload PHP 8.4 FPM and repeat the route checks.
 
 ## Validation
@@ -79,7 +98,8 @@ Rollback: extract the pre-deployment backup into `/var/www/clients/client9/web12
 - x64 and x86 were downloaded locally and again through the production HTTPS flow; byte counts and SHA-256 checksums matched.
 - Both production tokens were rejected with HTTP 404 after their first use.
 - Direct public executable and private-storage URL probes returned HTTP 404.
-- Visual production QA found four equally sized desktop cards, no horizontal overflow and no browser console warnings or errors.
+- Visual production QA confirmed three 381 x 430 px product cards followed by one 1180 x 278 px Windows panel, with no horizontal overflow or browser console warnings/errors.
+- Local responsive QA at 375 CSS pixels confirmed one-column product cards, two stacked 58 px download controls and no horizontal overflow.
 - Existing CMS and theme package behavior remains unchanged by the variant implementation.
 
 ## Remaining risk and recommendation

@@ -21,7 +21,7 @@ $hasLicensedDownloads = (bool) array_filter($releases, static fn(array $release)
                 $licensed = !$release['enabled'] && $release['licensed'];
                 $variants = (array) ($release['variants'] ?? []);
             ?>
-                <article class="<?= $release['enabled'] ? 'is-downloadable' : ($licensed ? 'is-licensed' : 'is-listed') ?>">
+                <article class="<?= $release['enabled'] ? 'is-downloadable' : ($licensed ? 'is-licensed' : 'is-listed') ?><?= $variants ? ' is-variant-product' : '' ?>">
                     <div class="release-top">
                         <div class="feature-icon"><?= $icon($release['icon']) ?></div>
                         <span><?= $e($t('marketplace.types.' . $release['type'], ucfirst($release['type']))) ?></span>
@@ -39,20 +39,22 @@ $hasLicensedDownloads = (bool) array_filter($releases, static fn(array $release)
                         <?php endif; ?>
                     </div>
                     <?php if ($release['enabled'] && $variants): ?>
-                        <div class="download-variants">
-                            <?php foreach ($variants as $variant): ?>
-                                <form method="post" action="/download/request/" class="download-form">
-                                    <input type="hidden" name="csrf" value="<?= $e($csrf) ?>">
-                                    <input type="hidden" name="package" value="<?= $e($release['id']) ?>">
-                                    <input type="hidden" name="variant" value="<?= $e($variant['key']) ?>">
-                                    <button class="button <?= $variant['recommended'] ? 'button-primary' : 'button-secondary' ?>" type="submit">
-                                        <span><strong><?= $e($t($variant['label_key'])) ?></strong><small><?= $e($variant['size']) ?><?php if ($variant['recommended']): ?> · <?= $e($t('marketplace.recommended')) ?><?php endif; ?></small></span>
-                                        <?= $icon('arrow-right') ?>
-                                    </button>
-                                </form>
-                            <?php endforeach; ?>
+                        <div class="variant-panel">
+                            <div class="download-variants">
+                                <?php foreach ($variants as $variant): ?>
+                                    <form method="post" action="/download/request/" class="download-form">
+                                        <input type="hidden" name="csrf" value="<?= $e($csrf) ?>">
+                                        <input type="hidden" name="package" value="<?= $e($release['id']) ?>">
+                                        <input type="hidden" name="variant" value="<?= $e($variant['key']) ?>">
+                                        <button class="button <?= $variant['recommended'] ? 'button-primary' : 'button-secondary' ?>" type="submit">
+                                            <span><strong><?= $e($t($variant['label_key'])) ?></strong><small><?= $e($variant['size']) ?><?php if ($variant['recommended']): ?> · <?= $e($t('marketplace.recommended')) ?><?php endif; ?></small></span>
+                                            <?= $icon('arrow-right') ?>
+                                        </button>
+                                    </form>
+                                <?php endforeach; ?>
+                            </div>
+                            <?php if ($release['note_key'] !== ''): ?><p class="release-note"><?= $icon('shield-check') ?><span><?= $e($t($release['note_key'])) ?></span></p><?php endif; ?>
                         </div>
-                        <?php if ($release['note_key'] !== ''): ?><p class="release-note"><?= $icon('shield-check') ?><span><?= $e($t($release['note_key'])) ?></span></p><?php endif; ?>
                     <?php elseif ($release['enabled']): ?>
                         <form method="post" action="/download/request/" class="download-form">
                             <input type="hidden" name="csrf" value="<?= $e($csrf) ?>">
