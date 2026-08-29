@@ -27,8 +27,8 @@ final class ContactService
         if (empty($input['privacy'])) $errors['privacy'] = $t('contact.errors.privacy');
         if (!$this->rateAllowed()) $errors['form'] = $t('contact.errors.rate');
         if ($errors) return ['success' => false, 'errors' => $errors, 'values' => $values];
-        $subject = '[Eduvixo.com] ' . ucfirst($values['topic']) . ' — ' . $values['organization'];
-        $body = implode("\n", ['Eduvixo website enquiry', '', 'Name: ' . $values['name'], 'Email: ' . $values['email'], 'Organization: ' . $values['organization'], 'Role: ' . ($values['role'] ?: '—'), 'Topic: ' . $values['topic'], 'Language: ' . $locale, '', 'Message:', $values['message']]);
+        $subject = '[Eduvixo.com] ' . ucfirst($values['topic']) . ' - ' . $values['organization'];
+        $body = implode("\n", ['Eduvixo website enquiry', '', 'Name: ' . $values['name'], 'Email: ' . $values['email'], 'Organization: ' . $values['organization'], 'Role: ' . ($values['role'] ?: '-'), 'Topic: ' . $values['topic'], 'Language: ' . $locale, '', 'Message:', $values['message']]);
         try { $this->mailer->send((string) $this->config['contact_recipient'], $subject, $body, $values['email']); }
         catch (\Throwable) { return ['success' => false, 'errors' => ['form' => $t('contact.errors.delivery')], 'values' => $values]; }
         $this->recordRate();
