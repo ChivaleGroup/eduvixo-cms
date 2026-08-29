@@ -13,9 +13,12 @@ foreach ($file in Get-ChildItem -LiteralPath $languageDirectory -Filter '*.json'
 }
 
 [xml](Get-Content -LiteralPath (Join-Path $root 'src\Eduvixo.Windows\App.xaml') -Raw) | Out-Null
-[xml](Get-Content -LiteralPath (Join-Path $root 'src\Eduvixo.Windows\MainWindow.xaml') -Raw) | Out-Null
+$mainWindow = [xml](Get-Content -LiteralPath (Join-Path $root 'src\Eduvixo.Windows\MainWindow.xaml') -Raw)
+if ($mainWindow.Window.WindowState -ne 'Maximized') {
+    throw 'The application must open maximized.'
+}
 
 dotnet build (Join-Path $root 'Eduvixo.Windows.slnx') --configuration Release --no-restore -warnaserror
 if ($LASTEXITCODE -ne 0) { throw 'Build verification failed.' }
 
-Write-Output "Verified $($expectedKeys.Count) localization keys across 7 languages and a warning-free Release build."
+Write-Output "Verified maximized startup, $($expectedKeys.Count) localization keys across 7 languages and a warning-free Release build."

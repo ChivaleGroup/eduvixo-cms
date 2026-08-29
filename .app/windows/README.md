@@ -5,6 +5,7 @@ Native Windows shell for the online Eduvixo workspace.
 ## Current scope
 
 - Branded work-mode launcher with online and intentionally disabled offline cards.
+- Maximized startup with standard Windows minimize, restore and close controls.
 - Seven interface languages: Chinese, English, German, Lao, Polish, Thai and Vietnamese.
 - Automatic Windows-language detection with English fallback.
 - Optional persistence of the selected language and online mode.
@@ -29,13 +30,13 @@ The project is pinned to the stable .NET SDK declared in `global.json`.
 
 ```powershell
 .\scripts\verify.ps1
-.\scripts\build.ps1 -Version 0.2.0
+.\scripts\build.ps1 -Version 0.2.1
 ```
 
 Self-contained outputs are written to:
 
-- `dist\0.2.0\win-x86\eduvixo.exe`
-- `dist\0.2.0\win-x64\eduvixo.exe`
+- `dist\0.2.1\win-x86\eduvixo.exe`
+- `dist\0.2.1\win-x64\eduvixo.exe`
 
 `SHA256SUMS.txt` contains the release hashes. Distribution output is excluded from Git; source, localization, build configuration and documentation are tracked.
 
