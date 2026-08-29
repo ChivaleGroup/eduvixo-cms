@@ -1,7 +1,7 @@
 # Eduvixo CMS - role assignment and Demo User mode
 
-Date: 2026-08-29  
-Environment: production demo CMS at `demo.eduvixo.com`  
+Date: 2026-08-29
+Environment: production demo CMS at `demo.eduvixo.com`
 Status: implemented, deployed and verified
 
 ## Objective
