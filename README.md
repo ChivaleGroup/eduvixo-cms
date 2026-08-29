@@ -17,3 +17,7 @@ Credentials under `.cfg/`, CMS distribution sources under `.cms/`, working docum
 - PHP cURL and JSON extensions
 
 Project decisions, deployment notes and verification records are maintained in `.wrk/`.
+
+## Windows application
+
+The source and reproducible build scripts for Eduvixo for Windows are maintained in `.app/windows/`. The application provides x86 and x64 online clients for the Eduvixo workspace; release binaries are generated locally and intentionally excluded from version control.

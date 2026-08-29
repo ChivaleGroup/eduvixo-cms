@@ -1,0 +1,21 @@
+$ErrorActionPreference = 'Stop'
+$root = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
+$languageDirectory = Join-Path $root 'src\Eduvixo.Windows\lang'
+$english = Get-Content -LiteralPath (Join-Path $languageDirectory 'en.json') -Raw | ConvertFrom-Json -AsHashtable
+$expectedKeys = @($english.Keys | Sort-Object)
+
+foreach ($file in Get-ChildItem -LiteralPath $languageDirectory -Filter '*.json') {
+    $dictionary = Get-Content -LiteralPath $file.FullName -Raw | ConvertFrom-Json -AsHashtable
+    $actualKeys = @($dictionary.Keys | Sort-Object)
+    if (Compare-Object $expectedKeys $actualKeys) {
+        throw "Localization schema mismatch: $($file.Name)"
+    }
+}
+
+[xml](Get-Content -LiteralPath (Join-Path $root 'src\Eduvixo.Windows\App.xaml') -Raw) | Out-Null
+[xml](Get-Content -LiteralPath (Join-Path $root 'src\Eduvixo.Windows\MainWindow.xaml') -Raw) | Out-Null
+
+dotnet build (Join-Path $root 'Eduvixo.Windows.slnx') --configuration Release --no-restore -warnaserror
+if ($LASTEXITCODE -ne 0) { throw 'Build verification failed.' }
+
+Write-Output "Verified $($expectedKeys.Count) localization keys across 7 languages and a warning-free Release build."

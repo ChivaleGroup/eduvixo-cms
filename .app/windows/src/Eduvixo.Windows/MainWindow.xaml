@@ -1,0 +1,178 @@
+<Window x:Class="Eduvixo.Windows.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+        Title="Eduvixo"
+        Width="1120"
+        Height="720"
+        MinWidth="900"
+        MinHeight="600"
+        WindowStartupLocation="CenterScreen"
+        Background="#041434"
+        FontFamily="Segoe UI"
+        UseLayoutRounding="True"
+        TextOptions.TextFormattingMode="Display"
+        Closing="Window_Closing">
+    <Window.Resources>
+        <Style x:Key="ModeCardStyle" TargetType="Button">
+            <Setter Property="Height" Value="254" />
+            <Setter Property="Padding" Value="30" />
+            <Setter Property="Margin" Value="10" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="VerticalContentAlignment" Value="Stretch" />
+            <Setter Property="Background" Value="White" />
+            <Setter Property="BorderBrush" Value="#D6E4F7" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Card" Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="22">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Card" Property="BorderBrush" Value="#75A8F3" />
+                                <Setter TargetName="Card" Property="Effect"><Setter.Value><DropShadowEffect BlurRadius="30" ShadowDepth="10" Opacity="0.24" Color="#001B4C" /></Setter.Value></Setter>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="Card" Property="BorderBrush" Value="#145EDB" /><Setter TargetName="Card" Property="BorderThickness" Value="2" /></Trigger>
+                            <Trigger Property="IsPressed" Value="True"><Setter TargetName="Card" Property="Background" Value="#F3F7FD" /></Trigger>
+                            <Trigger Property="IsEnabled" Value="False"><Setter TargetName="Card" Property="Opacity" Value="0.56" /><Setter Property="Cursor" Value="Arrow" /></Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="TextLinkStyle" TargetType="Button">
+            <Setter Property="Padding" Value="4" />
+            <Setter Property="Foreground" Value="#C7DAF5" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Button"><Border Padding="{TemplateBinding Padding}" Background="Transparent"><ContentPresenter /></Border></ControlTemplate></Setter.Value></Setter>
+            <Style.Triggers><Trigger Property="IsMouseOver" Value="True"><Setter Property="Foreground" Value="White" /></Trigger></Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid x:Name="StartView">
+            <Grid.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Offset="0" Color="#03112E" />
+                    <GradientStop Offset="0.58" Color="#062A67" />
+                    <GradientStop Offset="1" Color="#0A55B5" />
+                </LinearGradientBrush>
+            </Grid.Background>
+
+            <Ellipse Width="620" Height="620" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,-260,-330" Stroke="#2E72CF" StrokeThickness="1" Opacity="0.42" IsHitTestVisible="False" />
+            <Ellipse Width="440" Height="440" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,-170,-230" Stroke="#4F8CDF" StrokeThickness="1" Opacity="0.32" IsHitTestVisible="False" />
+
+            <Grid Margin="42,34,42,28">
+                <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+
+                <Grid Grid.Row="0">
+                    <Image Width="168" HorizontalAlignment="Left" Source="Assets/eduvixo-logo.png" Stretch="Uniform" />
+                    <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock x:Name="LanguageLabel" Margin="0,0,12,0" VerticalAlignment="Center" Foreground="#C6D8F0" FontSize="12" FontWeight="SemiBold" />
+                        <ComboBox x:Name="LanguagePicker" Width="178" Height="38" Padding="10,5" DisplayMemberPath="Name" SelectedValuePath="Code" SelectionChanged="LanguagePicker_SelectionChanged" />
+                    </StackPanel>
+                </Grid>
+
+                <Grid Grid.Row="1" Width="950" MaxWidth="950" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Margin="0,0,0,24" HorizontalAlignment="Center">
+                        <Border HorizontalAlignment="Center" Padding="12,6" Background="#183E78" BorderBrush="#3A6CA9" BorderThickness="1" CornerRadius="14">
+                            <TextBlock x:Name="PlatformLabel" Foreground="#BFD8F8" FontSize="11" FontWeight="Bold" Text="EDUVIXO FOR WINDOWS" />
+                        </Border>
+                        <TextBlock x:Name="ChooseModeTitle" Margin="0,15,0,6" HorizontalAlignment="Center" Foreground="White" FontSize="34" FontWeight="Bold" TextAlignment="Center" />
+                        <TextBlock x:Name="ChooseModeSubtitle" MaxWidth="650" HorizontalAlignment="Center" Foreground="#C6D7ED" FontSize="15" LineHeight="23" TextAlignment="Center" TextWrapping="Wrap" />
+                    </StackPanel>
+
+                    <UniformGrid Grid.Row="1" Columns="2">
+                        <Button x:Name="OnlineButton" Style="{StaticResource ModeCardStyle}" IsDefault="True" Click="OnlineButton_Click">
+                            <Grid>
+                                <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+                                <Border Width="56" Height="56" HorizontalAlignment="Left" Background="#EAF3FF" CornerRadius="16">
+                                    <Viewbox Width="28" Height="28"><Grid Width="24" Height="24"><Ellipse Margin="2" Stroke="#145EDB" StrokeThickness="1.8" /><Path Data="M2,12 H22 M12,2 C15,5 16,8 16,12 C16,16 15,19 12,22 M12,2 C9,5 8,8 8,12 C8,16 9,19 12,22" Stroke="#145EDB" StrokeThickness="1.8" StrokeStartLineCap="Round" StrokeEndLineCap="Round" /></Grid></Viewbox>
+                                </Border>
+                                <StackPanel Grid.Row="1" Margin="0,19,0,14">
+                                    <TextBlock x:Name="OnlineTitle" Foreground="#061B4F" FontSize="24" FontWeight="Bold" />
+                                    <TextBlock x:Name="OnlineDescription" Margin="0,7,0,0" Foreground="#60708A" FontSize="13" LineHeight="20" TextWrapping="Wrap" />
+                                </StackPanel>
+                                <Grid Grid.Row="2"><TextBlock x:Name="OnlineActionText" Foreground="#145EDB" FontSize="13" FontWeight="Bold" /><TextBlock HorizontalAlignment="Right" Foreground="#145EDB" FontSize="20" Text="→" /></Grid>
+                            </Grid>
+                        </Button>
+
+                        <Button x:Name="OfflineButton" Style="{StaticResource ModeCardStyle}" IsEnabled="False">
+                            <Grid>
+                                <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+                                <Grid>
+                                    <Border Width="56" Height="56" HorizontalAlignment="Left" Background="#EEF2F7" CornerRadius="16">
+                                        <Viewbox Width="28" Height="28"><Grid Width="24" Height="24"><Ellipse Margin="3,2,3,14" Stroke="#64748B" StrokeThickness="1.8" /><Path Data="M3,7 V17 C3,19.8 7,22 12,22 C17,22 21,19.8 21,17 V7 M3,12 C3,14.8 7,17 12,17 C17,17 21,14.8 21,12" Stroke="#64748B" StrokeThickness="1.8" StrokeStartLineCap="Round" StrokeEndLineCap="Round" /></Grid></Viewbox>
+                                    </Border>
+                                    <Border HorizontalAlignment="Right" VerticalAlignment="Top" Padding="9,5" Background="#E9EEF5" CornerRadius="10"><TextBlock x:Name="UnavailableBadge" Foreground="#617087" FontSize="10" FontWeight="Bold" /></Border>
+                                </Grid>
+                                <StackPanel Grid.Row="1" Margin="0,19,0,14">
+                                    <TextBlock x:Name="OfflineTitle" Foreground="#263B5D" FontSize="24" FontWeight="Bold" />
+                                    <TextBlock x:Name="OfflineDescription" Margin="0,7,0,0" Foreground="#748197" FontSize="13" LineHeight="20" TextWrapping="Wrap" />
+                                </StackPanel>
+                                <TextBlock Grid.Row="2" x:Name="OfflineActionText" Foreground="#748197" FontSize="13" FontWeight="Bold" />
+                            </Grid>
+                        </Button>
+                    </UniformGrid>
+
+                    <CheckBox Grid.Row="2" x:Name="RememberChoiceCheckBox" Margin="10,22,10,0" HorizontalAlignment="Center" Foreground="White" FontSize="13" Checked="RememberChoiceCheckBox_Changed" Unchecked="RememberChoiceCheckBox_Changed" />
+                </Grid>
+
+                <Grid Grid.Row="2">
+                    <TextBlock VerticalAlignment="Center" Foreground="#87A2C8" FontSize="11" Text="© Eduvixo &amp; QUANT Software House" />
+                    <Button x:Name="WebsiteButton" HorizontalAlignment="Right" Style="{StaticResource TextLinkStyle}" Click="WebsiteButton_Click" />
+                </Grid>
+            </Grid>
+        </Grid>
+
+        <Grid x:Name="BrowserView" Visibility="Collapsed" Background="White">
+            <Grid.RowDefinitions><RowDefinition Height="62" /><RowDefinition Height="*" /></Grid.RowDefinitions>
+            <Border Grid.Row="0" Background="#041434" BorderBrush="#17325F" BorderThickness="0,0,0,1">
+                <Grid Margin="14,0">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                    <Image Width="116" Margin="4,0,18,0" Source="Assets/eduvixo-logo.png" Stretch="Uniform" />
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Button x:Name="LauncherButton" Width="38" Style="{StaticResource ToolbarButtonStyle}" ToolTip="Start" Click="LauncherButton_Click" Content="⌂" />
+                        <Button x:Name="BackButton" Width="38" Style="{StaticResource ToolbarButtonStyle}" ToolTip="Back" Click="BackButton_Click" Content="←" />
+                        <Button x:Name="ForwardButton" Width="38" Style="{StaticResource ToolbarButtonStyle}" ToolTip="Forward" Click="ForwardButton_Click" Content="→" />
+                        <Button x:Name="RefreshButton" Width="38" Style="{StaticResource ToolbarButtonStyle}" ToolTip="Refresh" Click="RefreshButton_Click" Content="↻" />
+                    </StackPanel>
+                    <Border Grid.Column="2" Height="36" Margin="10,0,14,0" VerticalAlignment="Center" Background="#0E2852" BorderBrush="#294A79" BorderThickness="1" CornerRadius="10">
+                        <StackPanel Margin="12,0" Orientation="Horizontal" VerticalAlignment="Center"><Ellipse Width="7" Height="7" Margin="0,0,8,0" Fill="#42C894" /><TextBlock x:Name="BrowserAddress" VerticalAlignment="Center" Foreground="#C7D8EF" FontSize="12" Text="demo.eduvixo.com" /></StackPanel>
+                    </Border>
+                    <Button Grid.Column="3" x:Name="BrowserWebsiteButton" MinWidth="136" Style="{StaticResource ToolbarButtonStyle}" Click="WebsiteButton_Click" />
+                </Grid>
+            </Border>
+
+            <Grid Grid.Row="1">
+                <wv2:WebView2 x:Name="Browser" DefaultBackgroundColor="White" />
+                <Border x:Name="LoadingOverlay" Background="#F7FAFE">
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Border Width="58" Height="58" HorizontalAlignment="Center" Background="#EAF3FF" CornerRadius="18"><TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#145EDB" FontSize="26" FontWeight="Bold" Text="E" /></Border>
+                        <TextBlock x:Name="LoadingText" Margin="0,16,0,0" HorizontalAlignment="Center" Foreground="#4D607C" FontSize="14" />
+                    </StackPanel>
+                </Border>
+                <Border x:Name="ErrorOverlay" Width="520" Padding="38" HorizontalAlignment="Center" VerticalAlignment="Center" Background="White" BorderBrush="#DCE7F5" BorderThickness="1" CornerRadius="24" Visibility="Collapsed">
+                    <Border.Effect><DropShadowEffect BlurRadius="45" ShadowDepth="16" Opacity="0.16" Color="#061B4F" /></Border.Effect>
+                    <StackPanel>
+                        <Border Width="56" Height="56" HorizontalAlignment="Left" Background="#FFF2EE" CornerRadius="16"><TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#B5472D" FontSize="25" FontWeight="Bold" Text="!" /></Border>
+                        <TextBlock x:Name="ErrorTitle" Margin="0,20,0,8" Foreground="#061B4F" FontSize="25" FontWeight="Bold" TextWrapping="Wrap" />
+                        <TextBlock x:Name="ErrorDescription" Foreground="#60708A" FontSize="14" LineHeight="22" TextWrapping="Wrap" />
+                        <StackPanel Margin="0,26,0,0" Orientation="Horizontal">
+                            <Button x:Name="RetryButton" MinWidth="150" Style="{StaticResource PrimaryButtonStyle}" Click="RetryButton_Click" />
+                            <Button x:Name="ErrorLauncherButton" Margin="10,0,0,0" Padding="18,10" Background="White" BorderBrush="#C9D8EA" BorderThickness="1" Cursor="Hand" Click="LauncherButton_Click" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>
