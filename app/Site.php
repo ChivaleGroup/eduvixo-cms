@@ -110,7 +110,7 @@ final class Site
         if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') $this->plain('Method not allowed.', 405);
         if (!$this->validCsrf($_POST['csrf'] ?? null)) { $_SESSION['marketplace_error'] = true; header('Location: ' . $this->routePath('marketplace', $this->locale), true, 303); exit; }
         try {
-            $location = $this->marketplaceService()->issueBrowserToken((string) ($_POST['package'] ?? ''), $this->clientIp(), $this->userAgent());
+            $location = $this->marketplaceService()->issueBrowserToken((string) ($_POST['package'] ?? ''), (string) ($_POST['variant'] ?? ''), $this->clientIp(), $this->userAgent());
             header('Location: ' . $location, true, 303);
             exit;
         } catch (\RuntimeException) { $_SESSION['marketplace_error'] = true; header('Location: ' . $this->routePath('marketplace', $this->locale), true, 303); exit; }

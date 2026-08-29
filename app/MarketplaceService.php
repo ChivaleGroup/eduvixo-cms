@@ -13,22 +13,31 @@ final class MarketplaceService
         $licenseState = $this->browserLicenseState($ip);
         $items = [];
         foreach ($this->config['packages'] as $id => $package) {
+            $variants = [];
+            foreach ((array) ($package['variants'] ?? []) as $key => $variant) {
+                if (!is_array($variant)) continue;
+                $variants[] = [
+                    'key' => (string) $key, 'label_key' => (string) ($variant['label_key'] ?? ''),
+                    'size' => $this->size((int) ($variant['size'] ?? 0)), 'recommended' => (bool) ($variant['recommended'] ?? false),
+                ];
+            }
             $items[] = [
                 'id' => $id, 'type' => $package['type'], 'name' => $package['name'], 'version' => $package['version'],
-                'size' => $this->size((int) $package['size']), 'enabled' => (bool) $package['browser_enabled'],
+                'size' => $variants ? '' : $this->size((int) $package['size']), 'enabled' => (bool) $package['browser_enabled'],
                 'licensed' => (bool) ($package['license_download_enabled'] ?? false), 'locked' => $licenseState['locked'],
-                'icon' => $package['icon'], 'copy_key' => $package['copy_key'],
+                'icon' => $package['icon'], 'copy_key' => $package['copy_key'], 'variants' => $variants,
+                'meta_keys' => (array) ($package['meta_keys'] ?? []), 'note_key' => (string) ($package['note_key'] ?? ''),
             ];
         }
         return $items;
     }
 
-    public function issueBrowserToken(string $id, string $ip, string $userAgent): string
+    public function issueBrowserToken(string $id, string $variant, string $ip, string $userAgent): string
     {
-        $package = $this->package($id, 'browser_enabled');
+        $package = $this->package($id, 'browser_enabled', $variant);
         $this->assertPackage($package);
         $this->rate('browser', $ip, 10, 3600, 3);
-        return $this->createBrowserToken($id, 'browser_enabled', $ip, $userAgent);
+        return $this->createBrowserToken($id, 'browser_enabled', $ip, $userAgent, $variant);
     }
 
     public function issueLicensedBrowserToken(string $id, string $licenseKey, string $ip, string $userAgent): array
@@ -60,7 +69,7 @@ final class MarketplaceService
         @unlink($used);
         if ((int) ($payload['expires'] ?? 0) < time() || !hash_equals((string) ($payload['ip'] ?? ''), $this->fingerprint($ip)) || !hash_equals((string) ($payload['ua'] ?? ''), $this->fingerprint($userAgent))) $this->fail('Download token has expired.', 410);
         $capability = in_array(($payload['capability'] ?? ''), ['browser_enabled', 'license_download_enabled'], true) ? (string) $payload['capability'] : 'browser_enabled';
-        $package = $this->package((string) ($payload['package'] ?? ''), $capability);
+        $package = $this->package((string) ($payload['package'] ?? ''), $capability, (string) ($payload['variant'] ?? ''));
         $this->stream($package);
     }
 
@@ -111,9 +120,15 @@ final class MarketplaceService
     private function stream(array $package): never
     {
         $path = $this->assertPackage($package);
-        $name = preg_replace('/[^a-z0-9.-]/', '-', strtolower($package['slug'] . '-' . $package['version'])) . '.zip';
+        $defaultName = preg_replace('/[^a-z0-9.-]/', '-', strtolower($package['slug'] . '-' . $package['version'])) . '.zip';
+        $name = basename((string) ($package['download_name'] ?? $defaultName));
+        if (!preg_match('/^[A-Za-z0-9][A-Za-z0-9._-]{0,159}$/D', $name)) $name = $defaultName;
+        $contentType = (string) ($package['content_type'] ?? 'application/zip');
+        if (!preg_match('~^[a-z0-9][a-z0-9.+-]*/[a-z0-9][a-z0-9.+-]*$~Di', $contentType)) $contentType = 'application/octet-stream';
         if (session_status() === PHP_SESSION_ACTIVE) session_write_close();
-        header('Content-Type: application/zip');
+        @set_time_limit(0);
+        while (ob_get_level() > 0) @ob_end_clean();
+        header('Content-Type: ' . $contentType);
         header('Content-Length: ' . filesize($path));
         header('Content-Disposition: attachment; filename="' . $name . '"');
         header('Cache-Control: private, no-store, no-cache, must-revalidate');
@@ -124,11 +139,11 @@ final class MarketplaceService
         exit;
     }
 
-    private function createBrowserToken(string $id, string $capability, string $ip, string $userAgent): string
+    private function createBrowserToken(string $id, string $capability, string $ip, string $userAgent, string $variant = ''): string
     {
         $this->cleanupTokens();
         $token = rtrim(strtr(base64_encode(random_bytes(32)), '+/', '-_'), '=');
-        $payload = ['package' => $id, 'capability' => $capability, 'expires' => time() + (int) $this->config['token_ttl'], 'ip' => $this->fingerprint($ip), 'ua' => $this->fingerprint($userAgent)];
+        $payload = ['package' => $id, 'variant' => $variant, 'capability' => $capability, 'expires' => time() + (int) $this->config['token_ttl'], 'ip' => $this->fingerprint($ip), 'ua' => $this->fingerprint($userAgent)];
         $path = $this->tokenPath($token);
         $handle = @fopen($path, 'x');
         if (!$handle) throw new \RuntimeException('Download token could not be created.', 503);
@@ -199,10 +214,16 @@ final class MarketplaceService
         return $path;
     }
 
-    private function package(string $id, string $capability): array
+    private function package(string $id, string $capability, string $variant = ''): array
     {
         $package = $this->config['packages'][$id] ?? null;
         if (!is_array($package) || empty($package[$capability])) throw new \RuntimeException('Package is unavailable.', 404);
+        $variants = (array) ($package['variants'] ?? []);
+        if ($variants) {
+            if ($variant === '' || !isset($variants[$variant]) || !is_array($variants[$variant])) throw new \RuntimeException('Package variant is unavailable.', 404);
+            $package = array_replace($package, $variants[$variant]);
+            unset($package['variants']);
+        } elseif ($variant !== '') throw new \RuntimeException('Package variant is unavailable.', 404);
         return $package;
     }
 

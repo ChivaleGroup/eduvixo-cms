@@ -4,7 +4,7 @@ RewriteEngine On
 
 RewriteRule ^(?:\.git|\.env|\.ht) - [F,L,NC]
 RewriteRule ^(?:app|config|lang|resources|scripts|storage|\.cfg|\.cms|\.doc|\.wrk)(?:/|$) - [R=404,L,NC]
-RewriteRule \.(?:zip|sha|tar|tgz|gz|7z|rar)$ - [R=404,L,NC]
+RewriteRule \.(?:zip|sha|tar|tgz|gz|7z|rar|exe|msi|appx|msix)$ - [R=404,L,NC]
 RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 <IfModule mod_headers.c>
     Header always set X-Content-Type-Options "nosniff"

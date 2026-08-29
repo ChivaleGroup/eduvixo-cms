@@ -33,5 +33,23 @@ return [
             'file' => $packageRoot . '/shoudu-theme-1.1.1.zip', 'checksum' => '04e60ff5e3dd659cb41e914b3c5acbc008cdd2687a12f6b0355fe37c86aa9ee8',
             'browser_enabled' => false, 'license_download_enabled' => true, 'update_enabled' => false, 'icon' => 'graduation-cap', 'copy_key' => 'marketplace.shoudu_copy',
         ],
+        'e0250d15236f4c57ad2f32ff16e129e3' => [
+            'type' => 'application', 'slug' => 'eduvixo-windows', 'name' => 'Eduvixo for Windows', 'version' => '0.2.1',
+            'browser_enabled' => true, 'license_download_enabled' => false, 'update_enabled' => false, 'icon' => 'devices',
+            'copy_key' => 'marketplace.windows_copy', 'meta_keys' => ['marketplace.portable', 'marketplace.windows_compatibility'],
+            'note_key' => 'marketplace.windows_notice',
+            'variants' => [
+                'x64' => [
+                    'label_key' => 'marketplace.windows_x64', 'recommended' => true, 'size' => 157796032,
+                    'file' => $packageRoot . '/eduvixo-windows-0.2.1-x64.exe', 'checksum' => 'd3a0664af8294c82d690c49d60409f10dbd06b6f4dcbc6dc104bcb85cab448bf',
+                    'download_name' => 'eduvixo-windows-0.2.1-x64.exe', 'content_type' => 'application/vnd.microsoft.portable-executable',
+                ],
+                'x86' => [
+                    'label_key' => 'marketplace.windows_x86', 'recommended' => false, 'size' => 148780736,
+                    'file' => $packageRoot . '/eduvixo-windows-0.2.1-x86.exe', 'checksum' => '65009bf2395659e1c2addbdbe5fd569c452888d7aeb80a24491dbd60f7c45a4b',
+                    'download_name' => 'eduvixo-windows-0.2.1-x86.exe', 'content_type' => 'application/vnd.microsoft.portable-executable',
+                ],
+            ],
+        ],
     ],
 ];
