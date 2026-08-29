@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /download/
+Disallow: /demo/
+Disallow: /language/
+Disallow: /*?sent=
+Sitemap: https://www.eduvixo.com/sitemap.xml
+Host: www.eduvixo.com

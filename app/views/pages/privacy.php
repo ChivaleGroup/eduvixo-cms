@@ -1,0 +1,1 @@
+<?php declare(strict_types=1); $heroActions = []; require dirname(__DIR__) . '/page-hero.php'; ?><section class="section legal-page"><article class="shell narrow"><?php foreach ((array) $t('privacy.sections', []) as $section): ?><section><h2><?= $e($section['title']) ?></h2><p><?= $e($section['copy']) ?></p></section><?php endforeach; ?></article></section>

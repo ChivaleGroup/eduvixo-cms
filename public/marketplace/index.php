@@ -1,0 +1,1 @@
+<?php declare(strict_types=1); $path = (string) parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH); if (!in_array($path, ['/marketplace', '/marketplace/'], true)) { http_response_code(404); exit('Not found.'); } $site = require dirname(__DIR__, 2) . '/app/bootstrap.php'; $site->marketplace();

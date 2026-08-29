@@ -1,0 +1,2 @@
+<?php declare(strict_types=1); $heroActions = []; require dirname(__DIR__) . '/page-hero.php'; ?>
+<section class="section faq-page"><div class="shell narrow"><?php foreach ((array) $t('faq.items', []) as $index => $item): ?><details<?= $index === 0 ? ' open' : '' ?>><summary><?= $e($item['question']) ?><?= $icon('chevron-down') ?></summary><div><p><?= $e($item['answer']) ?></p></div></details><?php endforeach; ?></div></section>

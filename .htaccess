@@ -1,0 +1,14 @@
+Options -Indexes
+RewriteEngine On
+
+RewriteRule ^(?:\.env(?:\..*)?|\.cfg|\.cms|\.doc|\.git|\.src|\.wrk|app|config|lang|resources|scripts|storage|tmp)(?:/|$) - [F,L,NC]
+RewriteRule ^(?:README\.md|\.gitignore|\.info)$ - [F,L,NC]
+RewriteRule \.(?:zip|sha|tar|tgz|gz|7z|rar)$ - [R=404,L,NC]
+RewriteCond %{THE_REQUEST} "\s/+public(?:[/?\s]|$)" [NC]
+RewriteRule ^public(?:/|$) - [F,L]
+RewriteRule ^\.well-known/acme-challenge/ - [L]
+RewriteRule ^$ public/index.php [L]
+RewriteCond %{REQUEST_URI} !^/public/ [NC]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ public/$1 [L]

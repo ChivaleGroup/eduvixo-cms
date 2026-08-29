@@ -1,0 +1,2 @@
+<?php declare(strict_types=1); $heroActions = []; require dirname(__DIR__) . '/page-hero.php'; ?>
+<section class="section"><div class="shell knowledge-grid"><?php foreach ((array) $t('knowledge-base.categories', []) as $category): ?><article><div class="feature-icon"><?= $icon($category['icon']) ?></div><h2><?= $e($category['title']) ?></h2><p><?= $e($category['copy']) ?></p><ul><?php foreach ($category['articles'] as $article): ?><li><?= $icon('arrow-right') ?><span><?= $e($article) ?></span></li><?php endforeach; ?></ul></article><?php endforeach; ?></div></section>
