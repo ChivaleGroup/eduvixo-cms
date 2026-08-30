@@ -6,6 +6,8 @@ $heroActions = [];
 require dirname(__DIR__) . '/page-hero.php';
 $releases = (array) ($state['marketplace_items'] ?? []);
 $hasLicensedDownloads = (bool) array_filter($releases, static fn(array $release): bool => !empty($release['licensed']));
+$filterTypes = ['all', 'system', 'theme', 'addon', 'plugin', 'application'];
+$filterPrices = ['all', 'free', 'paid'];
 ?>
 <section class="section marketplace-page">
     <div class="shell">
@@ -13,12 +15,32 @@ $hasLicensedDownloads = (bool) array_filter($releases, static fn(array $release)
             <div class="marketplace-alert" role="alert"><?= $icon('shield-check') ?><span><?= $e($t('marketplace.download_error')) ?></span></div>
         <?php endif; ?>
         <div class="marketplace-toolbar">
-            <div><strong><?= count($releases) ?></strong><span><?= $e($t('marketplace.available')) ?></span></div>
+            <div><strong data-marketplace-visible-count><?= count($releases) ?></strong><span><?= $e($t('marketplace.available')) ?></span></div>
             <p><?= $icon('shield-check') ?><?= $e($t('marketplace.verified')) ?></p>
         </div>
-        <?php if (array_filter($releases, static fn(array $release): bool => ($release['release_channel'] ?? 'stable') === 'beta')): ?>
-            <div class="marketplace-alert" role="note"><?= $icon('calendar-days') ?><span><?= $e($t('marketplace.calendar_beta_notice')) ?></span></div>
-        <?php endif; ?>
+        <section class="marketplace-discovery" data-marketplace-filter data-count-template="<?= $e($t('marketplace.results_count')) ?>">
+            <form class="marketplace-search" role="search">
+                <label class="marketplace-query">
+                    <span><?= $e($t('marketplace.search_label')) ?></span>
+                    <span class="marketplace-query-field"><?= $icon('search') ?><input type="search" name="q" autocomplete="off" placeholder="<?= $e($t('marketplace.search_placeholder')) ?>" data-marketplace-query></span>
+                </label>
+                <label class="marketplace-select"><span><?= $e($t('marketplace.filter_type')) ?></span><select name="type" data-marketplace-type>
+                    <?php foreach ($filterTypes as $type): ?><option value="<?= $e($type) ?>"><?= $e($type === 'all' ? $t('marketplace.filter_all') : $t('marketplace.types.' . $type, ucfirst($type))) ?></option><?php endforeach; ?>
+                </select></label>
+                <label class="marketplace-select"><span><?= $e($t('marketplace.filter_price')) ?></span><select name="price" data-marketplace-price>
+                    <?php foreach ($filterPrices as $priceFilter): ?><option value="<?= $e($priceFilter) ?>"><?= $e($t('marketplace.filter_' . $priceFilter)) ?></option><?php endforeach; ?>
+                </select></label>
+            </form>
+            <div class="marketplace-filter-groups">
+                <div class="marketplace-filter-group"><span><?= $e($t('marketplace.filter_types_legend')) ?></span><div class="marketplace-chips" role="group" aria-label="<?= $e($t('marketplace.filter_types_legend')) ?>">
+                    <?php foreach ($filterTypes as $type): ?><button type="button" class="<?= $type === 'all' ? 'is-active' : '' ?>" data-marketplace-type-chip="<?= $e($type) ?>" aria-pressed="<?= $type === 'all' ? 'true' : 'false' ?>"><?= $e($type === 'all' ? $t('marketplace.filter_all') : $t('marketplace.types.' . $type, ucfirst($type))) ?></button><?php endforeach; ?>
+                </div></div>
+                <div class="marketplace-filter-group"><span><?= $e($t('marketplace.filter_prices_legend')) ?></span><div class="marketplace-chips marketplace-price-chips" role="group" aria-label="<?= $e($t('marketplace.filter_prices_legend')) ?>">
+                    <?php foreach ($filterPrices as $priceFilter): ?><button type="button" class="<?= $priceFilter === 'all' ? 'is-active' : '' ?>" data-marketplace-price-chip="<?= $e($priceFilter) ?>" aria-pressed="<?= $priceFilter === 'all' ? 'true' : 'false' ?>"><?= $e($t('marketplace.filter_' . $priceFilter)) ?></button><?php endforeach; ?>
+                </div></div>
+            </div>
+            <div class="marketplace-filter-summary"><span data-marketplace-results role="status" aria-live="polite"><?= $e(str_replace('{count}', (string) count($releases), $t('marketplace.results_count'))) ?></span><button type="button" data-marketplace-clear hidden><?= $e($t('marketplace.clear_filters')) ?></button></div>
+        </section>
         <div class="release-grid">
             <?php foreach ($releases as $release):
                 $licensed = !$release['enabled'] && $release['licensed'];
@@ -34,7 +56,7 @@ $hasLicensedDownloads = (bool) array_filter($releases, static fn(array $release)
                 $price = $t($priceKey ?? 'marketplace.free');
                 $detailLabel = str_replace('{name}', (string) $release['name'], (string) $t('marketplace.details_open'));
             ?>
-                <article id="package-<?= $e($release['id']) ?>" class="<?= $release['enabled'] ? 'is-downloadable' : ($licensed ? 'is-licensed' : 'is-listed') ?><?= $variants ? ' is-variant-product' : '' ?><?= $release['card_class'] !== '' ? ' ' . $e($release['card_class']) : '' ?>">
+                <article id="package-<?= $e($release['id']) ?>" data-marketplace-item data-filter-type="<?= $e($release['type']) ?>" data-filter-price="<?= $priceKey === null ? 'free' : 'paid' ?>" data-filter-search="<?= $e($release['name'] . ' ' . $t('marketplace.types.' . $release['type'], ucfirst($release['type'])) . ' ' . $t($release['copy_key'])) ?>" class="<?= $release['enabled'] ? 'is-downloadable' : ($licensed ? 'is-licensed' : 'is-listed') ?><?= $variants ? ' is-variant-product' : '' ?><?= $release['card_class'] !== '' ? ' ' . $e($release['card_class']) : '' ?>">
                     <div class="release-top">
                         <button class="feature-icon" type="button" aria-label="<?= $e($detailLabel) ?>" data-marketplace-detail data-detail-name="<?= $e($release['name']) ?>" data-detail-type="<?= $e($t('marketplace.types.' . $release['type'], ucfirst($release['type']))) ?>" data-detail-copy="<?= $e($t($release['copy_key'])) ?>" data-detail-version="<?= $e($release['version']) ?>" data-detail-channel="<?= $e($t('marketplace.' . ($release['release_channel'] ?? 'stable'))) ?>" data-detail-price="<?= $e($price) ?>" data-detail-meta="<?= $e(json_encode($detailMeta, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP)) ?>"><?= $icon($release['icon']) ?></button>
                         <span><?= $e($t('marketplace.types.' . $release['type'], ucfirst($release['type']))) ?></span>
@@ -92,6 +114,7 @@ $hasLicensedDownloads = (bool) array_filter($releases, static fn(array $release)
                 </article>
             <?php endforeach; ?>
         </div>
+        <div class="marketplace-empty" data-marketplace-empty hidden><div><?= $icon('search') ?></div><h2><?= $e($t('marketplace.no_results_title')) ?></h2><p><?= $e($t('marketplace.no_results_copy')) ?></p><button class="button button-secondary" type="button" data-marketplace-empty-clear><?= $e($t('marketplace.clear_filters')) ?></button></div>
         <div class="marketplace-note"><?= $icon('shield-check') ?><div><h2><?= $e($t('marketplace.security_title')) ?></h2><p><?= $e($t('marketplace.security_copy')) ?></p></div></div>
     </div>
 </section>
