@@ -1,0 +1,9 @@
+/var/www/clients/client9/web121/web/storage/logs/notification-worker.log {
+    weekly
+    rotate 4
+    compress
+    missingok
+    notifempty
+    create 0640 web121 client9
+    su web121 client9
+}

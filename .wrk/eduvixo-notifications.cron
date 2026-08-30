@@ -1,0 +1,3 @@
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+* * * * * web121 umask 027; /usr/bin/php /var/www/clients/client9/web121/web/scripts/notification-worker.php 50 >> /var/www/clients/client9/web121/web/storage/logs/notification-worker.log 2>&1

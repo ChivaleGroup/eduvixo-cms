@@ -9,6 +9,7 @@
 storage/*
 !storage/.gitkeep
 tmp/
+/.wrk/notification-stage/
 *.log
 *.zip
 *.zip.sha*
