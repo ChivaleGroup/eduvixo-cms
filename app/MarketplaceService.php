@@ -96,6 +96,15 @@ final class MarketplaceService
         $this->stream($this->package($id, 'update_enabled'));
     }
 
+    public function streamCoreUpdater(): never
+    {
+        $this->authenticateUpdater();
+        $metadata=dirname((string)$this->config['package_root']).'/core-release.json';
+        $release=is_file($metadata)?json_decode((string)file_get_contents($metadata),true):null;
+        if(!is_array($release)||!preg_match('/^\d+\.\d+\.\d+$/D',(string)($release['version']??'')))$this->jsonError('Core release is unavailable.',503);
+        $this->stream(['file'=>$this->config['package_root'].'/eduvixo-core-'.$release['version'].'.zip','checksum'=>$release['checksum'],'size'=>$release['size'],'slug'=>'eduvixo-core','version'=>$release['version']]);
+    }
+
     private function authenticateUpdater(): void
     {
         $header = (string) ($_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '');
@@ -104,11 +113,12 @@ final class MarketplaceService
         $domain = trim((string) ($_SERVER['HTTP_X_EDUVIXO_DOMAIN'] ?? ''));
         if (!$this->httpsUrl($domain)) $this->jsonError('Installation identity is invalid.', 401);
         $this->rate('updater', $this->clientIp() . "\0" . hash_hmac('sha256', $license, $this->secret), 120, 3600, 0);
-        $cache = $this->directory('license-cache') . '/' . hash_hmac('sha256', $license . "\0" . $domain, $this->secret) . '.json';
+        $productName=$this->productHeader('HTTP_X_EDUVIXO_PRODUCT_NAME','Eduvixo',150);$productModel=$this->productHeader('HTTP_X_EDUVIXO_PRODUCT_MODEL','Education Digital Experience & Communication Platform',200);
+        $cache = $this->directory('license-cache') . '/' . hash_hmac('sha256', $license . "\0" . $domain . "\0" . $productName . "\0" . $productModel, $this->secret) . '.json';
         $cached = is_file($cache) ? json_decode((string) @file_get_contents($cache), true) : null;
         if (is_array($cached) && (int) ($cached['expires'] ?? 0) >= time()) return;
         $version = preg_match('/^[0-9A-Za-z.-]{1,30}$/D', (string) ($_SERVER['HTTP_X_EDUVIXO_VERSION'] ?? ''), $versionMatch) ? $versionMatch[0] : '1.0.0';
-        $payload = http_build_query(['type' => 'software', 'LicenseKey' => $license, 'DomainUrl' => $domain, 'ProductName' => 'Eduvixo', 'ProductModel' => 'Education Digital Experience & Communication Platform', 'ProductVersion' => $version], '', '&', PHP_QUERY_RFC3986);
+        $payload = http_build_query(['type' => 'software', 'LicenseKey' => $license, 'DomainUrl' => $domain, 'ProductName' => $productName, 'ProductModel' => $productModel, 'ProductVersion' => $version], '', '&', PHP_QUERY_RFC3986);
         $curl = curl_init((string) $this->config['license_endpoint']);
         if ($curl === false) $this->jsonError('Authorization service is unavailable.', 503);
         curl_setopt_array($curl, [CURLOPT_POST => true, CURLOPT_POSTFIELDS => $payload, CURLOPT_HTTPHEADER => ['Content-Type: application/x-www-form-urlencoded', 'Accept: application/json'], CURLOPT_USERAGENT => 'Eduvixo-Marketplace/1.0', CURLOPT_RETURNTRANSFER => true, CURLOPT_CONNECTTIMEOUT => 5, CURLOPT_TIMEOUT => 12, CURLOPT_FOLLOWLOCATION => false, CURLOPT_PROTOCOLS => CURLPROTO_HTTPS, CURLOPT_REDIR_PROTOCOLS => CURLPROTO_HTTPS]);
@@ -117,6 +127,14 @@ final class MarketplaceService
         if ($error !== '' || $status < 200 || $status >= 300 || !is_array($data) || !empty($data['error']) || empty($data['data'])) $this->jsonError('License authorization failed.', 403);
         @file_put_contents($cache, json_encode(['expires' => time() + (int) $this->config['license_cache_ttl']], JSON_THROW_ON_ERROR), LOCK_EX);
         @chmod($cache, 0640);
+    }
+
+    private function productHeader(string $serverKey,string $fallback,int $limit): string
+    {
+        $encoded=(string)($_SERVER[$serverKey]??'');if($encoded==='')return$fallback;
+        $value=base64_decode($encoded,true);
+        if(!is_string($value)||$value===''||strlen($value)>$limit||preg_match('/[\x00-\x1f\x7f]/',$value))$this->jsonError('Installation product identity is invalid.',401);
+        return$value;
     }
 
     private function stream(array $package): never

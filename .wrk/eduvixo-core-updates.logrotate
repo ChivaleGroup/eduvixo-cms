@@ -1,0 +1,19 @@
+/var/www/clients/client9/web121/web/storage/logs/system-update.log {
+    weekly
+    rotate 8
+    compress
+    missingok
+    notifempty
+    su web121 client9
+    create 0640 web121 client9
+}
+
+/var/www/clients/client59/web119/web/storage/logs/system-update.log {
+    weekly
+    rotate 8
+    compress
+    missingok
+    notifempty
+    su web119 client59
+    create 0640 web119 client59
+}

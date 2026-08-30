@@ -1,0 +1,44 @@
+# Core update center, official Marketplace and account switching
+
+## Scope and findings
+- Separate Shoudu site: `/var/www/clients/client59/web119/web`, owner web119:client59. Demo: web121:client9. Product website: web123:client9. Shoudu has its own database, active Shoudu theme, licensed engine 1.0, migrations through 022. Do not copy demo environment, database or themes into Shoudu.
+- Configuration loads `.env` with `putenv` only when unset. Multi-installation diagnostic scripts must clear CMS_* environment values between loads or use separate processes. The initial diagnostic mixed environments; corrected before any mutation.
+- Mario is active, is_demo=0, Owner. No password reset or role/database change is required. The demo read-only guard incorrectly denied POST /login, so switching accounts with an existing demo browser session failed before the normal authentication checks. Only login/logout are excluded; password, CAPTCHA, CSRF and demo write denial remain enforced. Recent authentication logs also contain CAPTCHA failures; these are distinct from credential failures.
+- Marketplace previously contained only bundled/local extensions; official feed was not connected. New signed public metadata includes the same 11 website products, descriptions and price labels in all 7 website languages. Private/license-gated package delivery is unchanged. Links lead to the corresponding website card for existing licensed download UI.
+
+## Implementation and safety
+- New signed core release is separate from the clean installer. Build version 1.0.3 is separate from licensed engine 1.0. Version 1.0.2 was successfully installed on demo before a Shoudu-specific product-identity incompatibility was discovered; 1.0.3 preserves immutable releases and adds the multi-product protocol fix. Do not change licensing product/version parameters.
+- `SystemUpdate` verifies Ed25519 signature, immutable SHA256 inventory, bounded ZIP sizes, duplicate entries, no links/traversal, supported baseline and PHP. Core allowlist: app, public/theme, public/index, two worker scripts and additive migrations 023/024 only. Config, environment, themes, plugins, addons, uploads and public school assets are never replaced.
+- CLI worker checks official catalog every six hours and processes authenticated administrator update requests. Web is AJAX polling; no automatic installation. Bell reports cached available core updates. Paid downloads are not made public by the catalog.
+- Exclusive local lock, PHP maintenance response, private previous-file ZIP and consistent database SQL snapshot before writes. Core files are atomically replaced individually, public entry point last. Migrations 023/024 are idempotent/additive; existing user data is preserved. Failed install restores previous files, retains additive schema. Interrupted worker leaves maintenance enabled for manual review, never silently serves a partial deployment.
+- Signed catalog expiry is one year; regenerate/publish before expiry even if there is no new core release. Keep a verified previous catalog on transient network failure; report last successful check/error honestly.
+
+## Planned production changes and rollback
+Create fresh complete archives and SQL backups of both CMS installations and changed website distribution files before deployment. Bootstrap updater into each older installation, configure a site-owned per-minute worker, publish verified signed release, and request installation through the same worker used by the UI. Do not install optional paid modules on Shoudu.
+
+Recovery archives reside under private `storage/system-updates/recovery-*`; database snapshot imports into an EMPTY recovery database. Preserve intervening user writes before switching a restored database. On ordinary failures old files recover automatically; additive schema can remain. On process interruption use inventory and verified recovery ZIP to restore only exact recorded paths, check config/license/themes, and remove only the matching maintenance flag once healthy. Full server snapshots provide a second recovery path.
+
+Deployment and verification results will be appended after execution.
+
+## Production deployment - 2026-08-30
+- Full verified pre-deployment backup: `/root/eduvixo-backups/core-update-pre-20260830-105809`.
+  - `demo.sql`: 194499 bytes, SHA256 `788c3e550af4e0b574e52e087ce4e2b70c01bc219f1ce312be0078cd94319e9d`.
+  - `demo.tar.gz`: 31712353 bytes, SHA256 `6f54dd9ca93347923fe7eabad74f435f6bd3f5663e8f59c483982b1f8f0e28f1`.
+  - `shoudu.sql`: 172539 bytes, SHA256 `3594a3ceffaea13c9adffdcc71c165b24df03c14d69ce53072e3e5b62100651d`.
+  - `shoudu.tar.gz`: 209850692 bytes, SHA256 `49a4fd510846f4576405ae936a3377b83d9d2f704d04a4acda9d73fcd07b7ae3`.
+  - `website.tar.gz`: 156433974 bytes, SHA256 `ba5c4e981f49b22dcf0f2dbc69ac3b847f08475a517b8e71fccf05b4c9609c69`.
+- The first bootstrap stopped before a core/database write because the helper under `/root` was not traversable by the site account. The product website endpoints and bootstrap classes/cron had been published. New endpoint directories initially inherited root ownership and returned 403; ownership was corrected before continuing. Both conditions are corrected in the retained deployment script.
+- Demo first updated successfully to 1.0.2. Shoudu's signed package request was correctly rejected before any write because its valid product identity is `CMS School` / `CMS School for Shoudu`, while the updater protocol had hard-coded Eduvixo. No license data was changed and no validation was bypassed.
+- Release 1.0.3 adds bounded Base64 product identity headers to the existing bearer/domain/version request. The distribution API includes product identity in its authorization cache key and validates the actual product with the license authority. Unauthenticated requests still return 401. Both demo and Shoudu then downloaded the same checksum-verified core package under their own valid licenses.
+- Final recovery points: demo `recovery-4e2cb5eefb109a3752c3e302`; Shoudu `recovery-777b0bbac21f0717e07cf569`. Each contains mode-0600 file ZIP, inventory, database SQL gzip and checksum/recovery note. Earlier demo recovery from 1.0.2 remains private.
+- Private local source snapshot (no `.cfg` credentials): `F:\Git\ChivaleGroup\.backups\eduvixo-core-update-local-20260830-1915.tar.gz`, 32389459 bytes, SHA256 `1af1dfa25a0766fede77eb15b6b8f651e3ebf9083192caa2412d30452eed399e`. Existing prior full private snapshot retains the signing/configuration material; neither archive may be published.
+- Both installations now run build 1.0.3 on licensed engine 1.0. Per-minute site-owned workers are configured in `/etc/cron.d/eduvixo-core-demo` and `/etc/cron.d/eduvixo-core-shoudu`; catalog network checks remain limited to every six hours. Weekly compressed log rotation retains eight files.
+
+## Verification
+- 40 isolated assertions on a fresh MariaDB scratch database: signature and checksum enforcement, forged/tampered/traversal rejection, bounded product headers, legacy owner bootstrap, demo denial, CAPTCHA/password behavior, protected path preservation, real full install, database/file recovery artifacts, injected post-migration failure and automatic file rollback. Scratch database removed.
+- 31 live assertions: signed catalog and 11 products; seven localized website Marketplace pages; unauthorized package denial; both licensed products download the matching SHA256 core; build/engine/migrations/job/recovery state; login CAPTCHA+CSRF; private paths 403; Eduvixo and Shoudu themes preserved; Mario active Owner and not demo.
+- Pre/post backup comparison hashes are identical for `.env`, `config`, `themes`, `plugins` and `addons` on both installations. Apache, PHP 8.4 FPM and cron are active. No PHP-FPM warnings/errors since deployment. PHP lint and JavaScript syntax checks pass.
+- Browser UI review covered the Update screen and Polish official Marketplace cards, including prices/dependencies and responsive card layout. Production authenticated UI was not driven with a stored browser session; live HTTP/database/security invariants and the real updater path were verified independently.
+
+## Rollback
+Prefer the per-installation recovery directory for a core-only rollback: enable maintenance, preserve all intervening user writes, verify `inventory.json` and ZIP hashes, restore only recorded core paths and invalidate OPcache. Additive migrations 023/024 may remain. Use the full tar/SQL backup only for complete disaster recovery; SQL restoration discards post-backup writes, so restore into an empty recovery database first and reconcile data before switching. Restore the website tar if distribution endpoints must also be reverted. Never remove maintenance until PHP lint, login, license enforcement, active theme, public site and private-path denial are rechecked.

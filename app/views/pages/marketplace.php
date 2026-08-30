@@ -24,7 +24,7 @@ $hasLicensedDownloads = (bool) array_filter($releases, static fn(array $release)
                 $licensed = !$release['enabled'] && $release['licensed'];
                 $variants = (array) ($release['variants'] ?? []);
             ?>
-                <article class="<?= $release['enabled'] ? 'is-downloadable' : ($licensed ? 'is-licensed' : 'is-listed') ?><?= $variants ? ' is-variant-product' : '' ?><?= $release['card_class'] !== '' ? ' ' . $e($release['card_class']) : '' ?>">
+                <article id="package-<?= $e($release['id']) ?>" class="<?= $release['enabled'] ? 'is-downloadable' : ($licensed ? 'is-licensed' : 'is-listed') ?><?= $variants ? ' is-variant-product' : '' ?><?= $release['card_class'] !== '' ? ' ' . $e($release['card_class']) : '' ?>">
                     <div class="release-top">
                         <div class="feature-icon"><?= $icon($release['icon']) ?></div>
                         <span><?= $e($t('marketplace.types.' . $release['type'], ucfirst($release['type']))) ?></span>

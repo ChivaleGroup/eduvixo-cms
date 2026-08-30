@@ -1,0 +1,21 @@
+<?php
+declare(strict_types=1);
+if(PHP_SAPI!=='cli')exit;
+$project=dirname(__DIR__);$source=$project.'/.cms/source';$destination=$project.'/storage/marketplace';
+require $source.'/app/Core/SystemUpdate.php';
+$key=json_decode((string)file_get_contents($project.'/.cfg/marketplace-signing-key.json'),true,16,JSON_THROW_ON_ERROR);
+$secret=base64_decode($key['private_key'],true);if(!is_string($secret)||strlen($secret)!==64)throw new RuntimeException('Signing key is unavailable.');
+$release=json_decode((string)file_get_contents($source.'/app/release.json'),true,16,JSON_THROW_ON_ERROR);
+$version=$release['version'];$output=$destination.'/packages/eduvixo-core-'.$version.'.zip';
+if(is_file($output))throw new RuntimeException('Immutable release already exists. Use a new version, or remove only a verified unpublished build.');
+$files=[];foreach(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($source,FilesystemIterator::SKIP_DOTS)) as $file){if(!$file->isFile()||$file->isLink())continue;$path=str_replace('\\','/',substr($file->getPathname(),strlen($source)+1));if(App\Core\SystemUpdate::allowed($path))$files[$path]=hash_file('sha256',$file->getPathname());}ksort($files);
+$manifest=['schema'=>1,'type'=>'core','version'=>$version,'engine'=>'1.0','php'=>'8.2.0','channel'=>'beta','files'=>$files];
+$raw=json_encode($manifest,JSON_UNESCAPED_SLASHES|JSON_THROW_ON_ERROR);$zip=new ZipArchive();if($zip->open($output,ZipArchive::CREATE|ZipArchive::EXCL)!==true)throw new RuntimeException('Cannot create core release.');$zip->addFromString('eduvixo-core.json',$raw);$zip->addFromString('signature.ed25519',base64_encode(sodium_crypto_sign_detached($raw,$secret)));foreach($files as $path=>$hash)$zip->addFile($source.'/'.$path,'payload/'.$path);if(!$zip->close())throw new RuntimeException('Cannot finalize core release.');
+$core=['version'=>$version,'engine'=>'1.0','channel'=>'beta','size'=>filesize($output),'checksum'=>hash_file('sha256',$output),'summary'=>'Core update center with automatic checks, official Marketplace, system notification support, secure account switching and licensed multi-product installations.'];
+file_put_contents($destination.'/core-release.json',json_encode($core,JSON_UNESCAPED_SLASHES|JSON_THROW_ON_ERROR));
+$catalog=(static fn($path)=>require $path)($project.'/config/marketplace.php');$languages=[];foreach(['en','de','zh','vi','th','lo','pl'] as $locale)$languages[$locale]=json_decode((string)file_get_contents($project.'/lang/'.$locale.'.json'),true,64,JSON_THROW_ON_ERROR);
+$lookup=static function(array $copy,string $path):string{foreach(explode('.',$path) as $part)$copy=$copy[$part]??[];return is_string($copy)?$copy:'';};
+$products=[];foreach($catalog['packages'] as $id=>$package){$copy=[];foreach($languages as $locale=>$language)$copy[$locale]=['description'=>$lookup($language,$package['copy_key']),'meta'=>array_map(static fn($path)=>$lookup($language,$path),$package['meta_keys']??[])];$products[]=['id'=>$id,'type'=>$package['type'],'name'=>$package['name'],'version'=>$package['version'],'channel'=>$package['release_channel']??'stable','licensed'=>!empty($package['license_download_enabled']),'icon'=>$package['icon'],'copy'=>$copy];}
+$payload=json_encode(['schema'=>1,'issued_at'=>time(),'expires_at'=>time()+31536000,'core'=>$core,'products'=>$products],JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR);
+file_put_contents($destination.'/official-catalog.json',json_encode(['signed_payload'=>base64_encode($payload),'signature'=>base64_encode(sodium_crypto_sign_detached($payload,$secret))],JSON_THROW_ON_ERROR));
+echo json_encode(['version'=>$version,'files'=>count($files),'size'=>$core['size'],'sha256'=>$core['checksum'],'products'=>count($products),'languages'=>count($languages)],JSON_THROW_ON_ERROR).PHP_EOL;
