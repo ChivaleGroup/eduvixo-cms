@@ -56,4 +56,3 @@ Restore `console.php`, `eduvixo-page-builder.js`, and `eduvixo-surveys.js` from 
 - Local and deployed SHA-256 hashes match for all five files.
 - `apache2`, `php8.5-fpm`, and `mariadb` remain active.
 - No new application error was recorded in the demo virtual-host error log after deployment.
-
