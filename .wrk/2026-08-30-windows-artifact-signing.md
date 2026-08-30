@@ -11,6 +11,7 @@ Status: identity validation requires Verified ID presentation
 - The current identity has the `Artifact Signing Identity Verifier` role at the Artifact Signing account scope.
 - A Public organization identity validation for Chivale Group LTD was submitted.
 - Microsoft changed the validation status to `Action Required` and requested presentation of a Microsoft Entra Verified ID through Microsoft Authenticator. If the requester does not already have a Verified ID, the Microsoft page offers verification through a trusted identity verifier.
+- The requester successfully presented the Verified ID. The Microsoft Credentials page confirms `Verification successful`; the Artifact Signing resource still reports `Action Required` while the result propagates to the validation service.
 - No certificate profile can be created until Microsoft changes the identity validation status to `Completed`.
 
 No tax identifiers, business identifiers, personal data, access tokens, credentials or certificate material are recorded in this document or committed to Git.
