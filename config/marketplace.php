@@ -84,6 +84,12 @@ return [
             'browser_enabled' => false, 'license_download_enabled' => true, 'update_enabled' => false, 'icon' => 'chart-line', 'copy_key' => 'marketplace.google_analytics_copy',
             'license_product_name' => 'Google Analytics for Eduvixo', 'license_product_model' => 'Web Analytics Integration', 'license_product_version' => '1.0.0',
         ],
+        'ab80e3241f74ffa8f0d554f6ddf2b47a' => [
+            'type' => 'plugin', 'slug' => 'ai-translation-assistant', 'name' => 'AI Translation Assistant', 'version' => '1.0.0-beta.1', 'release_channel' => 'beta', 'size' => 15628,
+            'file' => $packageRoot . '/ai-translation-assistant-1.0.0-beta.1.zip', 'checksum' => 'd82f312c24037509814323371ce63dd52cd9037e4ed2a347d67f9a98c4ca7c72',
+            'browser_enabled' => false, 'license_download_enabled' => true, 'update_enabled' => false, 'icon' => 'languages', 'copy_key' => 'marketplace.ai_translation_copy',
+            'license_product_name' => 'AI Translation Assistant', 'license_product_model' => 'AI-Assisted Multilingual Content', 'license_product_version' => '1.0.0',
+        ],
         'e0250d15236f4c57ad2f32ff16e129e3' => [
             'type' => 'application', 'slug' => 'eduvixo-windows', 'name' => 'Eduvixo for Windows', 'version' => '0.2.3',
             'browser_enabled' => false, 'license_download_enabled' => true, 'update_enabled' => false, 'icon' => 'devices',
