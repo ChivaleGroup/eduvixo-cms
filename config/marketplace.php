@@ -19,8 +19,8 @@ return [
     'license_product_version' => '1.0',
     'packages' => [
         'b843df54f8988bad5b884f54dceb7250' => [
-            'type' => 'system', 'slug' => 'eduvixo-cms', 'name' => 'Eduvixo CMS', 'version' => '1.0.0', 'size' => 10334744,
-            'file' => $packageRoot . '/eduvixo-install-1.0.0.zip', 'checksum' => '48ae0869807ae5556edf4b45b55c5683560e6025ed01b3bec936c451c80b332d',
+            'type' => 'system', 'slug' => 'eduvixo-cms', 'name' => 'Eduvixo CMS', 'version' => '1.0.0', 'size' => 10392316,
+            'file' => $packageRoot . '/eduvixo-install-1.0.0.zip', 'checksum' => '3e0374a1983709845c31018d806034f269323de7da6f1f6b8740356874495a37',
             'browser_enabled' => false, 'license_download_enabled' => true, 'update_enabled' => false, 'icon' => 'layers', 'copy_key' => 'marketplace.system_copy',
         ],
         '56b33a4022d3ae4e11150c080f3e6189' => [
@@ -39,6 +39,43 @@ return [
             'browser_enabled' => false, 'license_download_enabled' => true, 'update_enabled' => false, 'icon' => 'shield-check', 'copy_key' => 'marketplace.ifirewall_copy',
             'meta_keys' => ['marketplace.ifirewall_price', 'marketplace.php_85'], 'card_class' => 'is-premium-plugin',
             'license_product_name' => 'iFirewall', 'license_product_model' => 'PHP Security & IP Firewall', 'license_product_version' => '1.0.0',
+        ],
+        'd7a9559c60326f90ccf5fbda507c9b5' => [
+            'type' => 'addon', 'slug' => 'calendar', 'name' => 'Eduvixo Calendar', 'version' => '1.0.1-beta.1', 'release_channel' => 'beta', 'size' => 34700,
+            'file' => $packageRoot . '/eduvixo-calendar-1.0.1-beta.1.zip', 'checksum' => '7c2e6d17ea1a9cd41aa9057ef3d04d66bfe9d6c21c915e1cba92322b8fa51200',
+            'browser_enabled' => false, 'license_download_enabled' => true, 'update_enabled' => false, 'icon' => 'calendar-days', 'copy_key' => 'marketplace.calendar_copy',
+            'meta_keys' => ['marketplace.calendar_price'], 'card_class' => 'is-premium-plugin',
+            'license_product_name' => 'Eduvixo Calendar', 'license_product_model' => 'Education Scheduling & Notifications', 'license_product_version' => '1.0.0',
+        ],
+        '292dea9e61c2cc57d8f067d8b3f26a' => [
+            'type' => 'plugin', 'slug' => 'google-calendar', 'name' => 'Google Calendar', 'version' => '1.0.1-beta.1', 'release_channel' => 'beta', 'size' => 2857,
+            'file' => $packageRoot . '/google-calendar-1.0.1-beta.1.zip', 'checksum' => '5c86a7107b03c90050872ab2e198cfc7e829ce1950f2e4ade458250857237530',
+            'browser_enabled' => false, 'license_download_enabled' => true, 'update_enabled' => false, 'icon' => 'calendar-sync', 'copy_key' => 'marketplace.google_calendar_copy',
+            'meta_keys' => ['marketplace.integration_price', 'marketplace.requires_calendar'], 'license_product_name' => 'Google Calendar for Eduvixo', 'license_product_model' => 'Calendar Integration', 'license_product_version' => '1.0.0',
+        ],
+        '944aa50a0453b031017751abd243a77c' => [
+            'type' => 'plugin', 'slug' => 'apple-calendar', 'name' => 'Apple Calendar', 'version' => '1.0.1-beta.1', 'release_channel' => 'beta', 'size' => 3194,
+            'file' => $packageRoot . '/apple-calendar-1.0.1-beta.1.zip', 'checksum' => '2a7f4ea6adcf4bf4dc0ad76292fa06d1c3d14608a15d21d1d4cf3f0818a3a178',
+            'browser_enabled' => false, 'license_download_enabled' => true, 'update_enabled' => false, 'icon' => 'calendar-sync', 'copy_key' => 'marketplace.apple_calendar_copy',
+            'meta_keys' => ['marketplace.integration_price', 'marketplace.requires_calendar'], 'license_product_name' => 'Apple Calendar for Eduvixo', 'license_product_model' => 'Calendar Integration', 'license_product_version' => '1.0.0',
+        ],
+        '20fab2cf5cc28954c5269d1435dd716' => [
+            'type' => 'plugin', 'slug' => 'microsoft-365-calendar', 'name' => 'Microsoft 365 Calendar', 'version' => '1.0.1-beta.1', 'release_channel' => 'beta', 'size' => 2923,
+            'file' => $packageRoot . '/microsoft-365-calendar-1.0.1-beta.1.zip', 'checksum' => '077432d36493931d01ddfbaac9c0d48115ae0a06fa40e0f5e0760a7fb63b45d7',
+            'browser_enabled' => false, 'license_download_enabled' => true, 'update_enabled' => false, 'icon' => 'calendar-sync', 'copy_key' => 'marketplace.microsoft_calendar_copy',
+            'meta_keys' => ['marketplace.integration_price', 'marketplace.requires_calendar'], 'license_product_name' => 'Microsoft 365 Calendar for Eduvixo', 'license_product_model' => 'Calendar Integration', 'license_product_version' => '1.0.0',
+        ],
+        '40845422103c0ed50f9e7bdc6df974' => [
+            'type' => 'plugin', 'slug' => 'telegram-notifications', 'name' => 'Telegram Notifications', 'version' => '1.0.1-beta.1', 'release_channel' => 'beta', 'size' => 2386,
+            'file' => $packageRoot . '/telegram-notifications-1.0.1-beta.1.zip', 'checksum' => '4b147ed197cfb8903cd032a703e4672f06a18a8b1ef0235ac8f9aa559aecf908',
+            'browser_enabled' => false, 'license_download_enabled' => true, 'update_enabled' => false, 'icon' => 'send', 'copy_key' => 'marketplace.telegram_copy',
+            'meta_keys' => ['marketplace.integration_price', 'marketplace.requires_calendar'], 'license_product_name' => 'Telegram Notifications for Eduvixo', 'license_product_model' => 'Calendar Notification Integration', 'license_product_version' => '1.0.0',
+        ],
+        '854d28de19fe0025dc1f786786720529' => [
+            'type' => 'plugin', 'slug' => 'whatsapp-notifications', 'name' => 'WhatsApp Notifications', 'version' => '1.0.1-beta.1', 'release_channel' => 'beta', 'size' => 2857,
+            'file' => $packageRoot . '/whatsapp-notifications-1.0.1-beta.1.zip', 'checksum' => '067072da2a61a0c94b568eba00ebd44fbcc1c863907ca1756e3841271528c0fe',
+            'browser_enabled' => false, 'license_download_enabled' => true, 'update_enabled' => false, 'icon' => 'message-circle', 'copy_key' => 'marketplace.whatsapp_copy',
+            'meta_keys' => ['marketplace.integration_price', 'marketplace.requires_calendar'], 'license_product_name' => 'WhatsApp Notifications for Eduvixo', 'license_product_model' => 'Calendar Notification Integration', 'license_product_version' => '1.0.0',
         ],
         'e0250d15236f4c57ad2f32ff16e129e3' => [
             'type' => 'application', 'slug' => 'eduvixo-windows', 'name' => 'Eduvixo for Windows', 'version' => '0.2.3',

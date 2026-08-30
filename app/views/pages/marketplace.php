@@ -16,6 +16,9 @@ $hasLicensedDownloads = (bool) array_filter($releases, static fn(array $release)
             <div><strong><?= count($releases) ?></strong><span><?= $e($t('marketplace.available')) ?></span></div>
             <p><?= $icon('shield-check') ?><?= $e($t('marketplace.verified')) ?></p>
         </div>
+        <?php if (array_filter($releases, static fn(array $release): bool => ($release['release_channel'] ?? 'stable') === 'beta')): ?>
+            <div class="marketplace-alert" role="note"><?= $icon('calendar-days') ?><span><?= $e($t('marketplace.calendar_beta_notice')) ?></span></div>
+        <?php endif; ?>
         <div class="release-grid">
             <?php foreach ($releases as $release):
                 $licensed = !$release['enabled'] && $release['licensed'];
@@ -33,7 +36,7 @@ $hasLicensedDownloads = (bool) array_filter($releases, static fn(array $release)
                         <?php if ($release['enabled'] || $licensed): ?>
                             <?php if ($release['size'] !== ''): ?><span><?= $e($release['size']) ?></span><?php endif; ?>
                             <?php foreach ((array) ($release['meta_keys'] ?? []) as $metaKey): ?><span<?= str_ends_with((string) $metaKey, '_price') ? ' class="is-price"' : '' ?>><?= $e($t((string) $metaKey)) ?></span><?php endforeach; ?>
-                            <?php if (!$variants): ?><span><?= $e($t('marketplace.stable')) ?></span><?php endif; ?>
+                            <?php if (!$variants): ?><span><?= $e($t('marketplace.' . ($release['release_channel'] ?? 'stable'))) ?></span><?php endif; ?>
                         <?php else: ?>
                             <span><?= $e($t('marketplace.listed')) ?></span>
                         <?php endif; ?>

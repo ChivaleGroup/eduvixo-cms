@@ -1,0 +1,3 @@
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+* * * * * web121 umask 027; /usr/bin/php /var/www/clients/client9/web121/web/addons/calendar/scripts/calendar-worker.php /var/www/clients/client9/web121/web 50 >> /var/www/clients/client9/web121/web/storage/logs/calendar-worker.log 2>&1

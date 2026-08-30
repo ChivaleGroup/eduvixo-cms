@@ -23,6 +23,7 @@ final class MarketplaceService
             }
             $items[] = [
                 'id' => $id, 'type' => $package['type'], 'name' => $package['name'], 'version' => $package['version'],
+                'release_channel' => in_array($package['release_channel'] ?? 'stable', ['stable', 'beta', 'preview'], true) ? ($package['release_channel'] ?? 'stable') : 'stable',
                 'size' => $variants ? '' : $this->size((int) $package['size']), 'enabled' => (bool) $package['browser_enabled'],
                 'licensed' => (bool) ($package['license_download_enabled'] ?? false), 'locked' => $licenseState['locked'],
                 'icon' => $package['icon'], 'copy_key' => $package['copy_key'], 'variants' => $variants,
@@ -82,7 +83,7 @@ final class MarketplaceService
             if (!$package['update_enabled'] || $package['type'] !== $type || $package['slug'] !== $slug) continue;
             $this->assertPackage($package);
             $releases[] = [
-                'type' => $package['type'], 'slug' => $package['slug'], 'version' => $package['version'], 'release_channel' => 'stable',
+                'type' => $package['type'], 'slug' => $package['slug'], 'version' => $package['version'], 'release_channel' => $package['release_channel'] ?? 'stable',
                 'package_url' => $this->baseUrl . '/api/marketplace/v1/package/?id=' . rawurlencode($id), 'package_checksum' => $package['checksum'],
             ];
         }

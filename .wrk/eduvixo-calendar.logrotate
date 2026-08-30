@@ -1,0 +1,9 @@
+/var/www/clients/client9/web121/web/storage/logs/calendar-worker.log {
+    weekly
+    rotate 4
+    compress
+    missingok
+    notifempty
+    su web121 client9
+    create 0640 web121 client9
+}
