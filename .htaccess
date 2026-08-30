@@ -1,11 +1,14 @@
-Options -Indexes
+Options -Indexes -MultiViews
+LimitRequestBody 65536
 RewriteEngine On
 
-RewriteRule ^(?:\.env(?:\..*)?|\.cfg|\.cms|\.doc|\.git|\.src|\.wrk|app|config|lang|resources|scripts|storage|tmp)(?:/|$) - [F,L,NC]
-RewriteRule ^(?:README\.md|\.gitignore|\.info)$ - [F,L,NC]
+RewriteCond %{HTTP:Content-Length} ^(?:[1-9][0-9]{5,}|[7-9][0-9]{4}|6[6-9][0-9]{3}|65[6-9][0-9]{2}|655[4-9][0-9]|6553[7-9])$
+RewriteRule ^ - [R=413,L]
+RewriteRule ^(?:\.env(?:\..*)?|\.cfg|\.cms|\.doc|\.git|\.src|\.wrk|app|config|lang|resources|scripts|storage|tmp)(?:/|$) - [R=404,L,NC]
+RewriteRule ^(?:README\.md|\.gitignore|\.info)$ - [R=404,L,NC]
 RewriteRule \.(?:zip|sha|tar|tgz|gz|7z|rar|exe|msi|appx|msix)$ - [R=404,L,NC]
 RewriteCond %{THE_REQUEST} "\s/+public(?:[/?\s]|$)" [NC]
-RewriteRule ^public(?:/|$) - [F,L]
+RewriteRule ^public(?:/|$) - [R=404,L]
 RewriteRule ^\.well-known/acme-challenge/ - [L]
 RewriteRule ^$ public/index.php [L]
 RewriteCond %{REQUEST_URI} !^/public/ [NC]

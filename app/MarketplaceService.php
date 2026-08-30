@@ -195,7 +195,11 @@ final class MarketplaceService
     {
         $path = $this->licenseAttemptPath($ip);
         if (!is_file($path)) return ['attempts' => 0, 'locked' => false, 'retry_after' => 0];
-        $data = json_decode((string) @file_get_contents($path), true);
+        $handle = @fopen($path, 'rb');
+        if (!is_resource($handle) || !flock($handle, LOCK_SH)) { if (is_resource($handle)) fclose($handle); return ['attempts' => (int) $this->config['license_failure_limit'], 'locked' => true, 'retry_after' => 60]; }
+        try { $contents = stream_get_contents($handle); $data = json_decode(is_string($contents) ? $contents : '', true); }
+        finally { flock($handle, LOCK_UN); fclose($handle); }
+        if (!is_array($data)) return ['attempts' => (int) $this->config['license_failure_limit'], 'locked' => true, 'retry_after' => 60];
         return $this->normalizeLicenseState(is_array($data) ? $data : []);
     }
 
@@ -255,10 +259,16 @@ final class MarketplaceService
     private function rate(string $scope, string $subject, int $limit, int $window, int $minimum): void
     {
         $path = $this->directory('rate-' . $scope) . '/' . hash_hmac('sha256', $subject, $this->secret) . '.json';
-        $now = time(); $data = is_file($path) ? json_decode((string) @file_get_contents($path), true) : [];
-        $entries = array_values(array_filter(array_map('intval', is_array($data) ? $data : []), static fn(int $time): bool => $time > $now - $window));
-        if (count($entries) >= $limit || ($minimum > 0 && $entries && max($entries) > $now - $minimum)) throw new \RuntimeException('Too many download requests.', 429);
-        $entries[] = $now; @file_put_contents($path, json_encode($entries, JSON_THROW_ON_ERROR), LOCK_EX); @chmod($path, 0640);
+        $handle = @fopen($path, 'c+');
+        if (!is_resource($handle) || !flock($handle, LOCK_EX)) { if (is_resource($handle)) fclose($handle); throw new \RuntimeException('Rate-limit protection is unavailable.', 503); }
+        try {
+            $now = time(); $contents = stream_get_contents($handle); $data = json_decode(is_string($contents) ? $contents : '', true);
+            $entries = array_values(array_filter(array_map('intval', is_array($data) ? $data : []), static fn(int $time): bool => $time > $now - $window));
+            if (count($entries) >= $limit || ($minimum > 0 && $entries && max($entries) > $now - $minimum)) throw new \RuntimeException('Too many download requests.', 429);
+            $entries[] = $now; $encoded = json_encode($entries, JSON_THROW_ON_ERROR);
+            rewind($handle); if (!ftruncate($handle, 0) || fwrite($handle, $encoded) !== strlen($encoded) || !fflush($handle)) throw new \RuntimeException('Rate-limit protection is unavailable.', 503);
+        } finally { flock($handle, LOCK_UN); fclose($handle); }
+        @chmod($path, 0640);
     }
 
     private function cleanupTokens(): void

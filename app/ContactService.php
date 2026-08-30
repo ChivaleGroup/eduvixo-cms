@@ -25,23 +25,30 @@ final class ContactService
         if (!in_array($values['topic'], ['demo', 'implementation', 'self-hosted', 'marketplace', 'support', 'partnership', 'other'], true)) $errors['topic'] = $t('contact.errors.topic');
         if (mb_strlen($values['message']) < 20) $errors['message'] = $t('contact.errors.message');
         if (empty($input['privacy'])) $errors['privacy'] = $t('contact.errors.privacy');
-        if (!$this->rateAllowed()) $errors['form'] = $t('contact.errors.rate');
+        if (!$errors && !$this->consumeRate()) $errors['form'] = $t('contact.errors.rate');
         if ($errors) return ['success' => false, 'errors' => $errors, 'values' => $values];
         $subject = '[Eduvixo.com] ' . ucfirst($values['topic']) . ' - ' . $values['organization'];
         $body = implode("\n", ['Eduvixo website enquiry', '', 'Name: ' . $values['name'], 'Email: ' . $values['email'], 'Organization: ' . $values['organization'], 'Role: ' . ($values['role'] ?: '-'), 'Topic: ' . $values['topic'], 'Language: ' . $locale, '', 'Message:', $values['message']]);
         try { $this->mailer->send((string) $this->config['contact_recipient'], $subject, $body, $values['email']); }
         catch (\Throwable) { return ['success' => false, 'errors' => ['form' => $t('contact.errors.delivery')], 'values' => $values]; }
-        $this->recordRate();
         return ['success' => true, 'values' => []];
     }
 
-    private function rateAllowed(): bool
+    private function consumeRate(): bool
     {
-        $entries = $this->rateEntries(); $now = time();
-        return count(array_filter($entries, static fn(int $time): bool => $time > $now - 3600)) < 5 && (!$entries || max($entries) < $now - 20);
+        $path = $this->ratePath(); $handle = @fopen($path, 'c+');
+        if (!is_resource($handle) || !flock($handle, LOCK_EX)) { if (is_resource($handle)) fclose($handle); return false; }
+        try {
+            $now = time(); $contents = stream_get_contents($handle); $data = json_decode(is_string($contents) ? $contents : '', true);
+            $entries = array_values(array_filter(array_map('intval', is_array($data) ? $data : []), static fn(int $time): bool => $time > $now - 3600));
+            if (count($entries) >= 5 || ($entries && max($entries) > $now - 20)) return false;
+            $entries[] = $now; $encoded = json_encode($entries, JSON_THROW_ON_ERROR);
+            rewind($handle); if (!ftruncate($handle, 0) || fwrite($handle, $encoded) !== strlen($encoded) || !fflush($handle)) return false;
+        } catch (\Throwable) { return false; }
+        finally { flock($handle, LOCK_UN); fclose($handle); }
+        @chmod($path, 0640);
+        return true;
     }
-    private function recordRate(): void { $path = $this->ratePath(); $entries = array_filter($this->rateEntries(), static fn(int $time): bool => $time > time() - 3600); $entries[] = time(); @file_put_contents($path, json_encode(array_values($entries)), LOCK_EX); @chmod($path, 0640); }
-    private function rateEntries(): array { $path = $this->ratePath(); $data = is_file($path) ? json_decode((string) file_get_contents($path), true) : []; return array_values(array_filter(array_map('intval', is_array($data) ? $data : []))); }
-    private function ratePath(): string { $dir = $this->config['root'] . '/storage/rate-limits'; if (!is_dir($dir)) @mkdir($dir, 0750, true); $ip = (string) ($_SERVER['REMOTE_ADDR'] ?? 'unknown'); return $dir . '/' . hash_hmac('sha256', $ip, (string) $this->config['rate_key']) . '.json'; }
+    private function ratePath(): string { $dir = $this->config['root'] . '/storage/rate-limits'; if (!is_dir($dir) && !@mkdir($dir, 0750, true) && !is_dir($dir)) return $dir . '/unavailable'; $ip = (string) ($_SERVER['REMOTE_ADDR'] ?? 'unknown'); return $dir . '/' . hash_hmac('sha256', $ip, (string) $this->config['rate_key']) . '.json'; }
     private function text(mixed $value, int $max): string { return mb_substr(trim(str_replace("\0", '', (string) $value)), 0, $max); }
 }

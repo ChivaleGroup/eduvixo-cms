@@ -73,6 +73,8 @@ final class Site
         if ($segments && isset($this->config['languages'][strtolower($segments[0])])) array_shift($segments);
         $slug = implode('/', $segments); $page = array_search($slug, self::PAGE_ROUTES, true);
         if (!is_string($page)) $this->plain('Not found.', 404);
+        $method = strtoupper((string) ($_SERVER['REQUEST_METHOD'] ?? 'GET'));
+        if (!in_array($method, ['GET', 'HEAD'], true) && !($page === 'contact' && $method === 'POST')) $this->methodNotAllowed($page === 'contact' ? ['GET', 'HEAD', 'POST'] : ['GET', 'HEAD']);
         match ($page) { 'contact' => $this->contact(), 'marketplace' => $this->marketplace(), default => $this->render($page) };
     }
 
@@ -270,6 +272,9 @@ final class Site
     {
         if ($this->sessionStarted) return;
         if (session_status() !== PHP_SESSION_ACTIVE) {
+            ini_set('session.use_strict_mode', '1');
+            ini_set('session.use_only_cookies', '1');
+            ini_set('session.use_trans_sid', '0');
             session_name('eduvixo_site');
             session_set_cookie_params(['httponly' => true, 'samesite' => 'Lax', 'secure' => $this->secure(), 'path' => '/']);
             session_cache_limiter('');
@@ -287,7 +292,13 @@ final class Site
         header('X-Content-Type-Options: nosniff');
         header('X-Frame-Options: SAMEORIGIN');
         header('Permissions-Policy: camera=(), microphone=(), geolocation=(self)');
-        header("Content-Security-Policy: default-src 'self'; img-src 'self' data: https://www.google-analytics.com; style-src 'self'; script-src 'self' 'nonce-{$this->nonce}' https://www.googletagmanager.com; connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://region1.analytics.google.com; font-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'");
+        header('Strict-Transport-Security: max-age=31536000');
+        header('Cross-Origin-Opener-Policy: same-origin');
+        header('X-Permitted-Cross-Domain-Policies: none');
+        header('X-DNS-Prefetch-Control: off');
+        header('X-Download-Options: noopen');
+        header_remove('X-Powered-By');
+        header("Content-Security-Policy: default-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; img-src 'self' data: https://www.google-analytics.com; media-src 'self'; font-src 'self'; style-src 'self'; script-src 'self' 'nonce-{$this->nonce}' https://www.googletagmanager.com; connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://region1.analytics.google.com; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests");
     }
 
     private function requestPath(): string
@@ -379,6 +390,7 @@ final class Site
 
     private function json(array $data): never { header('Content-Type: application/json; charset=utf-8'); header('Cache-Control: no-store'); header('X-Robots-Tag: noindex, nofollow, noarchive'); echo json_encode($data, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES); exit; }
     private function jsonError(string $message, int $status, array $details = []): never { http_response_code($status); $this->json(['error' => true, 'message' => $message] + $details); }
+    private function methodNotAllowed(array $allowed): never { header('Allow: ' . implode(', ', $allowed)); $this->plain('Method not allowed.', 405); }
     private function plain(string $message, int $status): never { http_response_code($status); header('Content-Type: text/plain; charset=utf-8'); header('Cache-Control: no-store'); header('X-Robots-Tag: noindex, nofollow, noarchive'); echo $message; exit; }
     private function clientIp(): string { return (string) ($_SERVER['REMOTE_ADDR'] ?? 'unknown'); }
     private function userAgent(): string { return substr((string) ($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 500); }

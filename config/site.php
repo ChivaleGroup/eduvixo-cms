@@ -17,6 +17,18 @@ if (is_file($envFile)) {
     }
 }
 $env = static fn(string $key, string $default = ''): string => (string) (getenv($key) !== false ? getenv($key) : $default);
+$rateKey = trim($env('SITE_RATE_KEY'));
+if ($rateKey === '') {
+    $secretPath = $root . '/storage/.site-rate-key';
+    if (!is_file($secretPath)) {
+        $directory = dirname($secretPath);
+        if (!is_dir($directory) && !mkdir($directory, 0750, true) && !is_dir($directory)) throw new RuntimeException('Secure runtime storage is unavailable.');
+        $candidate = bin2hex(random_bytes(32)); $handle = @fopen($secretPath, 'x');
+        if (is_resource($handle)) { try { if (fwrite($handle, $candidate) !== strlen($candidate) || !fflush($handle)) throw new RuntimeException('Security key could not be persisted.'); } finally { fclose($handle); } @chmod($secretPath, 0640); }
+    }
+    $rateKey = is_file($secretPath) ? trim((string) file_get_contents($secretPath)) : '';
+}
+if (!preg_match('/^[A-Fa-f0-9]{64}$/D', $rateKey)) throw new RuntimeException('SITE_RATE_KEY must contain 64 hexadecimal characters.');
 
 return [
     'root' => $root,
@@ -25,7 +37,7 @@ return [
     'contact_recipient' => $env('SITE_CONTACT_RECIPIENT', 'info@eduvixo.com'),
     'google_site_verification' => $env('SITE_GOOGLE_VERIFICATION'),
     'google_analytics_id' => $env('SITE_GOOGLE_ANALYTICS_ID', 'G-CCZKQZHM4S'),
-    'rate_key' => $env('SITE_RATE_KEY', hash('sha256', $root)),
+    'rate_key' => strtolower($rateKey),
     'marketplace' => require __DIR__ . '/marketplace.php',
     'languages' => [
         'zh' => ['english' => 'Chinese', 'native' => '中文', 'country' => ['CN', 'HK', 'MO', 'TW']],

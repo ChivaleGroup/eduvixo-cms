@@ -1,0 +1,4 @@
+Contact: mailto:info@eduvixo.com
+Expires: 2027-08-31T23:59:59Z
+Preferred-Languages: en, pl
+Canonical: https://www.eduvixo.com/.well-known/security.txt
