@@ -19,8 +19,8 @@ return [
     'license_product_version' => '1.0',
     'packages' => [
         'b843df54f8988bad5b884f54dceb7250' => [
-            'type' => 'system', 'slug' => 'eduvixo-cms', 'name' => 'Eduvixo CMS', 'version' => '1.0.0', 'size' => 9392262,
-            'file' => $packageRoot . '/eduvixo-install-1.0.0.zip', 'checksum' => '4cff5f05292346fd4def417a17c224487b053a84d4609f7befdf2dacd658d392',
+            'type' => 'system', 'slug' => 'eduvixo-cms', 'name' => 'Eduvixo CMS', 'version' => '1.0.0', 'size' => 10334744,
+            'file' => $packageRoot . '/eduvixo-install-1.0.0.zip', 'checksum' => '48ae0869807ae5556edf4b45b55c5683560e6025ed01b3bec936c451c80b332d',
             'browser_enabled' => false, 'license_download_enabled' => true, 'update_enabled' => false, 'icon' => 'layers', 'copy_key' => 'marketplace.system_copy',
         ],
         '56b33a4022d3ae4e11150c080f3e6189' => [
@@ -41,20 +41,20 @@ return [
             'license_product_name' => 'iFirewall', 'license_product_model' => 'PHP Security & IP Firewall', 'license_product_version' => '1.0.0',
         ],
         'e0250d15236f4c57ad2f32ff16e129e3' => [
-            'type' => 'application', 'slug' => 'eduvixo-windows', 'name' => 'Eduvixo for Windows', 'version' => '0.2.1',
+            'type' => 'application', 'slug' => 'eduvixo-windows', 'name' => 'Eduvixo for Windows', 'version' => '0.2.3',
             'browser_enabled' => true, 'license_download_enabled' => false, 'update_enabled' => false, 'icon' => 'devices',
             'copy_key' => 'marketplace.windows_copy', 'meta_keys' => ['marketplace.portable', 'marketplace.windows_compatibility'],
             'note_key' => 'marketplace.windows_notice',
             'variants' => [
                 'x64' => [
-                    'label_key' => 'marketplace.windows_x64', 'recommended' => true, 'size' => 157796032,
-                    'file' => $packageRoot . '/eduvixo-windows-0.2.1-x64.exe', 'checksum' => 'd3a0664af8294c82d690c49d60409f10dbd06b6f4dcbc6dc104bcb85cab448bf',
-                    'download_name' => 'eduvixo-windows-0.2.1-x64.exe', 'content_type' => 'application/vnd.microsoft.portable-executable',
+                    'label_key' => 'marketplace.windows_x64', 'recommended' => true, 'size' => 157791936,
+                    'file' => $packageRoot . '/eduvixo-windows-0.2.3-x64.exe', 'checksum' => '0633a2025d12c6fab266bb233bb258f6b7ba10dc3220c1644edd5dbf6738656d',
+                    'download_name' => 'eduvixo-windows-0.2.3-x64.exe', 'content_type' => 'application/vnd.microsoft.portable-executable',
                 ],
                 'x86' => [
-                    'label_key' => 'marketplace.windows_x86', 'recommended' => false, 'size' => 148780736,
-                    'file' => $packageRoot . '/eduvixo-windows-0.2.1-x86.exe', 'checksum' => '65009bf2395659e1c2addbdbe5fd569c452888d7aeb80a24491dbd60f7c45a4b',
-                    'download_name' => 'eduvixo-windows-0.2.1-x86.exe', 'content_type' => 'application/vnd.microsoft.portable-executable',
+                    'label_key' => 'marketplace.windows_x86', 'recommended' => false, 'size' => 148772544,
+                    'file' => $packageRoot . '/eduvixo-windows-0.2.3-x86.exe', 'checksum' => 'bef08fe7b71f3473e366fd33fba3cc6193781f17ae2ed71fcf9f2c47328986ef',
+                    'download_name' => 'eduvixo-windows-0.2.3-x86.exe', 'content_type' => 'application/vnd.microsoft.portable-executable',
                 ],
             ],
         ],
