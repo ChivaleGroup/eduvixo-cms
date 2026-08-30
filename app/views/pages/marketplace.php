@@ -23,19 +23,30 @@ $hasLicensedDownloads = (bool) array_filter($releases, static fn(array $release)
             <?php foreach ($releases as $release):
                 $licensed = !$release['enabled'] && $release['licensed'];
                 $variants = (array) ($release['variants'] ?? []);
+                $metaKeys = (array) ($release['meta_keys'] ?? []);
+                $priceKey = null;
+                $detailMeta = [];
+                foreach ($metaKeys as $metaKey) {
+                    $metaKey = (string) $metaKey;
+                    if (str_ends_with($metaKey, '_price')) $priceKey = $metaKey;
+                    else $detailMeta[] = $t($metaKey);
+                }
+                $price = $t($priceKey ?? 'marketplace.free');
+                $detailLabel = str_replace('{name}', (string) $release['name'], (string) $t('marketplace.details_open'));
             ?>
                 <article id="package-<?= $e($release['id']) ?>" class="<?= $release['enabled'] ? 'is-downloadable' : ($licensed ? 'is-licensed' : 'is-listed') ?><?= $variants ? ' is-variant-product' : '' ?><?= $release['card_class'] !== '' ? ' ' . $e($release['card_class']) : '' ?>">
                     <div class="release-top">
-                        <div class="feature-icon"><?= $icon($release['icon']) ?></div>
+                        <button class="feature-icon" type="button" aria-label="<?= $e($detailLabel) ?>" data-marketplace-detail data-detail-name="<?= $e($release['name']) ?>" data-detail-type="<?= $e($t('marketplace.types.' . $release['type'], ucfirst($release['type']))) ?>" data-detail-copy="<?= $e($t($release['copy_key'])) ?>" data-detail-version="<?= $e($release['version']) ?>" data-detail-channel="<?= $e($t('marketplace.' . ($release['release_channel'] ?? 'stable'))) ?>" data-detail-price="<?= $e($price) ?>" data-detail-meta="<?= $e(json_encode($detailMeta, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP)) ?>"><?= $icon($release['icon']) ?></button>
                         <span><?= $e($t('marketplace.types.' . $release['type'], ucfirst($release['type']))) ?></span>
                     </div>
                     <h2><?= $e($release['name']) ?></h2>
                     <p><?= $e($t($release['copy_key'])) ?></p>
                     <div class="release-meta">
                         <span>v<?= $e($release['version']) ?></span>
+                        <span class="is-price<?= $priceKey === null ? ' is-free' : '' ?>"><?= $e($price) ?></span>
                         <?php if ($release['enabled'] || $licensed): ?>
                             <?php if ($release['size'] !== ''): ?><span><?= $e($release['size']) ?></span><?php endif; ?>
-                            <?php foreach ((array) ($release['meta_keys'] ?? []) as $metaKey): ?><span<?= str_ends_with((string) $metaKey, '_price') ? ' class="is-price"' : '' ?>><?= $e($t((string) $metaKey)) ?></span><?php endforeach; ?>
+                            <?php foreach ($metaKeys as $metaKey): ?><?php if (!str_ends_with((string) $metaKey, '_price')): ?><span><?= $e($t((string) $metaKey)) ?></span><?php endif; ?><?php endforeach; ?>
                             <?php if (!$variants): ?><span><?= $e($t('marketplace.' . ($release['release_channel'] ?? 'stable'))) ?></span><?php endif; ?>
                         <?php else: ?>
                             <span><?= $e($t('marketplace.listed')) ?></span>
@@ -77,6 +88,17 @@ $hasLicensedDownloads = (bool) array_filter($releases, static fn(array $release)
         <div class="marketplace-note"><?= $icon('shield-check') ?><div><h2><?= $e($t('marketplace.security_title')) ?></h2><p><?= $e($t('marketplace.security_copy')) ?></p></div></div>
     </div>
 </section>
+<dialog class="product-dialog" data-product-dialog aria-labelledby="product-dialog-title">
+    <div class="product-dialog-head"><div class="product-dialog-icon" data-product-dialog-icon></div><button type="button" class="license-dialog-close" data-product-dialog-close aria-label="<?= $e($t('marketplace.details_close')) ?>">×</button></div>
+    <div class="product-dialog-copy"><span data-product-dialog-type></span><h2 id="product-dialog-title" data-product-dialog-name></h2><p data-product-dialog-copy></p></div>
+    <dl class="product-dialog-facts">
+        <div><dt><?= $e($t('marketplace.details_version')) ?></dt><dd data-product-dialog-version></dd></div>
+        <div><dt><?= $e($t('marketplace.details_channel')) ?></dt><dd data-product-dialog-channel></dd></div>
+        <div><dt><?= $e($t('marketplace.details_price')) ?></dt><dd class="product-dialog-price" data-product-dialog-price></dd></div>
+        <div data-product-dialog-meta-wrap><dt><?= $e($t('marketplace.details_requirements')) ?></dt><dd><ul data-product-dialog-meta></ul></dd></div>
+    </dl>
+    <div class="product-dialog-actions"><button class="button button-primary" type="button" data-product-dialog-close><?= $e($t('marketplace.details_close')) ?></button></div>
+</dialog>
 <?php if ($hasLicensedDownloads): ?>
     <dialog class="license-dialog" data-license-dialog aria-labelledby="license-dialog-title">
         <div class="license-dialog-head"><div class="license-dialog-icon"><?= $icon('lock') ?></div><button type="button" class="license-dialog-close" data-license-close aria-label="<?= $e($t('marketplace.license_cancel')) ?>">×</button></div>
