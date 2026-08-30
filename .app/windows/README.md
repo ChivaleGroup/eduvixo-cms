@@ -30,15 +30,25 @@ The project is pinned to the stable .NET SDK declared in `global.json`.
 
 ```powershell
 .\scripts\verify.ps1
-.\scripts\build.ps1 -Version 0.2.1
+.\scripts\build.ps1 -Version 0.2.2
 ```
 
 Self-contained outputs are written to:
 
-- `dist\0.2.1\win-x86\eduvixo.exe`
-- `dist\0.2.1\win-x64\eduvixo.exe`
+- `dist\0.2.2\win-x86\eduvixo.exe`
+- `dist\0.2.2\win-x64\eduvixo.exe`
 
 `SHA256SUMS.txt` contains the release hashes. Distribution output is excluded from Git; source, localization, build configuration and documentation are tracked.
+
+## Signed release
+
+Production releases use Microsoft Azure Artifact Signing with a Public Trust certificate profile owned by Chivale Group LTD. Install the official `Microsoft.Azure.ArtifactSigningClientTools` package and ensure the signing identity has the `Artifact Signing Certificate Profile Signer` role before running:
+
+```powershell
+.\scripts\sign-release.ps1 -Version 0.2.2 -ProfileName EduvixoPublicTrust -InteractiveBrowser
+```
+
+The script always performs a clean build unless `-SkipBuild` is supplied. It signs both architectures with SHA-256, adds the Microsoft RFC 3161 timestamp, verifies the Authenticode trust chain and expected publisher, and regenerates `SHA256SUMS.txt` after signing. Authentication metadata is created in a temporary directory and removed after the operation; no access token, certificate, private key or signing credential is stored in the repository.
 
 ## Local data
 
