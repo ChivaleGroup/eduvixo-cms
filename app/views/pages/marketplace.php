@@ -52,10 +52,11 @@ $hasLicensedDownloads = (bool) array_filter($releases, static fn(array $release)
                             <span><?= $e($t('marketplace.listed')) ?></span>
                         <?php endif; ?>
                     </div>
-                    <?php if ($release['enabled'] && $variants): ?>
+                    <?php if (($release['enabled'] || $licensed) && $variants): ?>
                         <div class="variant-panel">
                             <div class="download-variants">
                                 <?php foreach ($variants as $variant): ?>
+                                    <?php if ($release['enabled']): ?>
                                     <form method="post" action="/download/request/" class="download-form">
                                         <input type="hidden" name="csrf" value="<?= $e($csrf) ?>">
                                         <input type="hidden" name="package" value="<?= $e($release['id']) ?>">
@@ -65,6 +66,12 @@ $hasLicensedDownloads = (bool) array_filter($releases, static fn(array $release)
                                             <?= $icon('arrow-right') ?>
                                         </button>
                                     </form>
+                                    <?php else: ?>
+                                        <button class="button button-license<?= $release['locked'] ? ' is-locked' : '' ?>" type="button" data-license-download data-package="<?= $e($release['id']) ?>" data-variant="<?= $e($variant['key']) ?>" data-package-name="<?= $e($release['name'] . ' - ' . $t($variant['label_key'])) ?>" <?= $release['locked'] ? 'disabled aria-disabled="true"' : '' ?>>
+                                            <span><strong><?= $e($t($variant['label_key'])) ?></strong><small data-download-label><?= $e($release['locked'] ? $t('marketplace.download_unavailable') : $variant['size'] . ($variant['recommended'] ? ' · ' . $t('marketplace.recommended') : '')) ?></small></span>
+                                            <?= $icon('lock') ?>
+                                        </button>
+                                    <?php endif; ?>
                                 <?php endforeach; ?>
                             </div>
                             <?php if ($release['note_key'] !== ''): ?><p class="release-note"><?= $icon('shield-check') ?><span><?= $e($t($release['note_key'])) ?></span></p><?php endif; ?>
@@ -104,7 +111,7 @@ $hasLicensedDownloads = (bool) array_filter($releases, static fn(array $release)
         <div class="license-dialog-head"><div class="license-dialog-icon"><?= $icon('lock') ?></div><button type="button" class="license-dialog-close" data-license-close aria-label="<?= $e($t('marketplace.license_cancel')) ?>">×</button></div>
         <div class="license-dialog-copy"><span>Eduvixo Marketplace</span><h2 id="license-dialog-title"><?= $e($t('marketplace.license_modal_title')) ?></h2><p><?= $e($t('marketplace.license_modal_copy')) ?></p><strong data-license-package-name></strong></div>
         <form data-license-form data-endpoint="/download/license/" data-locked-label="<?= $e($t('marketplace.download_unavailable')) ?>" data-network-error="<?= $e($t('marketplace.license_service_error')) ?>" novalidate>
-            <input type="hidden" name="csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="package" value="">
+            <input type="hidden" name="csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="package" value=""><input type="hidden" name="variant" value="">
             <label for="marketplace-license-key"><?= $e($t('marketplace.license_label')) ?></label>
             <div class="license-input"><span><?= $icon('lock') ?></span><input id="marketplace-license-key" name="license" type="text" maxlength="128" required autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="<?= $e($t('marketplace.license_placeholder')) ?>"></div>
             <p class="license-privacy"><?= $icon('shield-check') ?><?= $e($t('marketplace.license_privacy')) ?></p>

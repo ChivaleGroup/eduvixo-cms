@@ -22,11 +22,12 @@ return [
             'type' => 'system', 'slug' => 'eduvixo-cms', 'name' => 'Eduvixo CMS', 'version' => '1.0.1', 'size' => 10406984,
             'file' => $packageRoot . '/eduvixo-install-1.0.1.zip', 'checksum' => 'fbbd9b8df946979ded70f60106e00668b0c17fe6df0642d070d78504e60bd519',
             'browser_enabled' => false, 'license_download_enabled' => true, 'update_enabled' => false, 'icon' => 'layers', 'copy_key' => 'marketplace.system_copy',
+            'meta_keys' => ['marketplace.cms_price'],
         ],
         '56b33a4022d3ae4e11150c080f3e6189' => [
             'type' => 'theme', 'slug' => 'eduvixo', 'name' => 'Eduvixo', 'version' => '1.1.6', 'size' => 1565831,
             'file' => $packageRoot . '/eduvixo-theme-1.1.6.zip', 'checksum' => '67f85343d5c32650537e5c3576640312c639efd6ee05d6bc8a0469896f3d6769',
-            'browser_enabled' => true, 'license_download_enabled' => false, 'update_enabled' => true, 'icon' => 'layout', 'copy_key' => 'marketplace.eduvixo_copy',
+            'browser_enabled' => false, 'license_download_enabled' => true, 'update_enabled' => true, 'icon' => 'layout', 'copy_key' => 'marketplace.eduvixo_copy',
         ],
         '60f0067c95f1e2719a97e66c7b78633c' => [
             'type' => 'theme', 'slug' => 'shoudu', 'name' => 'Shoudu', 'version' => '1.1.1', 'size' => 9450487,
@@ -77,9 +78,15 @@ return [
             'browser_enabled' => false, 'license_download_enabled' => true, 'update_enabled' => false, 'icon' => 'message-circle', 'copy_key' => 'marketplace.whatsapp_copy',
             'meta_keys' => ['marketplace.notification_price', 'marketplace.system_notifications'], 'license_product_name' => 'WhatsApp Notifications for Eduvixo', 'license_product_model' => 'Calendar Notification Integration', 'license_product_version' => '1.0.0',
         ],
+        'c42137f830b6a10e8896a57eddfe6aee' => [
+            'type' => 'plugin', 'slug' => 'google-analytics', 'name' => 'Google Analytics', 'version' => '1.0.0', 'size' => 8845,
+            'file' => $packageRoot . '/google-analytics-1.0.0.zip', 'checksum' => '68ddbc291b03e87afbaeb4ac2fef1d966b1ca982edc40ff9d5d38e15b9ad4c1f',
+            'browser_enabled' => false, 'license_download_enabled' => true, 'update_enabled' => false, 'icon' => 'chart-line', 'copy_key' => 'marketplace.google_analytics_copy',
+            'license_product_name' => 'Google Analytics for Eduvixo', 'license_product_model' => 'Web Analytics Integration', 'license_product_version' => '1.0.0',
+        ],
         'e0250d15236f4c57ad2f32ff16e129e3' => [
             'type' => 'application', 'slug' => 'eduvixo-windows', 'name' => 'Eduvixo for Windows', 'version' => '0.2.3',
-            'browser_enabled' => true, 'license_download_enabled' => false, 'update_enabled' => false, 'icon' => 'devices',
+            'browser_enabled' => false, 'license_download_enabled' => true, 'update_enabled' => false, 'icon' => 'devices',
             'copy_key' => 'marketplace.windows_copy', 'meta_keys' => ['marketplace.portable', 'marketplace.windows_compatibility'],
             'note_key' => 'marketplace.windows_notice',
             'variants' => [

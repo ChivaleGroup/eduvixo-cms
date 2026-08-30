@@ -42,9 +42,9 @@ final class MarketplaceService
         return $this->createBrowserToken($id, 'browser_enabled', $ip, $userAgent, $variant);
     }
 
-    public function issueLicensedBrowserToken(string $id, string $licenseKey, string $ip, string $userAgent): array
+    public function issueLicensedBrowserToken(string $id, string $licenseKey, string $ip, string $userAgent, string $variant = ''): array
     {
-        $package = $this->package($id, 'license_download_enabled');
+        $package = $this->package($id, 'license_download_enabled', $variant);
         $state = $this->browserLicenseState($ip);
         if ($state['locked']) return ['ok' => false, 'locked' => true, 'remaining' => 0, 'retry_after' => $state['retry_after']];
         $licenseKey = trim($licenseKey);
@@ -57,7 +57,7 @@ final class MarketplaceService
         $this->clearLicenseFailures($ip);
         $this->assertPackage($package);
         $this->rate('browser', $ip, 10, 3600, 3);
-        return ['ok' => true, 'download_url' => $this->createBrowserToken($id, 'license_download_enabled', $ip, $userAgent)];
+        return ['ok' => true, 'download_url' => $this->createBrowserToken($id, 'license_download_enabled', $ip, $userAgent, $variant)];
     }
 
     public function streamBrowser(string $token, string $ip, string $userAgent): never

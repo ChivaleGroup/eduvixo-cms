@@ -25,7 +25,7 @@
     <link rel="stylesheet" href="<?= $e($asset('assets/css/site.min.css')) ?>">
     <script type="application/ld+json" nonce="<?= $e($nonce) ?>"><?= json_encode($structuredData, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) ?></script>
 </head>
-<body data-locale="<?= $e($locale) ?>" data-system-detection="<?= $needsSystemDetection ? '1' : '0' ?>">
+<body data-locale="<?= $e($locale) ?>" data-system-detection="<?= $needsSystemDetection ? '1' : '0' ?>" data-analytics-id="<?= $e($analyticsId) ?>">
 <a class="skip-link" href="#content"><?= $e($t('a11y.skip')) ?></a>
 <header class="site-header" data-header>
     <div class="shell header-inner">
@@ -52,5 +52,13 @@
     <div class="shell footer-bottom"><div class="footer-credits"><span>© Copyright by Eduvixo &amp; <a href="https://www.ittsp.com/?IdRef=eduvixo.com" target="_blank" rel="noopener noreferrer">QUANT Software House</a>. All rights reserved.</span><a href="https://www.chivale.com/?IdRef=eduvixo.com" target="_blank" rel="noopener noreferrer">Hosting provided by Chivale Group.</a></div><span class="footer-identity"><?= $e($t('footer.identity')) ?></span></div>
 </footer>
 <button class="back-to-top" type="button" aria-label="<?= $e($t('a11y.back_to_top')) ?>" aria-hidden="true" tabindex="-1" data-back-to-top><?= $icon('arrow-right') ?></button>
+<?php if ($analyticsId !== ''): ?>
+<section class="analytics-consent" role="dialog" aria-labelledby="analytics-consent-title" data-analytics-consent hidden>
+    <div class="analytics-consent-icon"><?= $icon('chart-line') ?></div>
+    <div class="analytics-consent-copy"><h2 id="analytics-consent-title"><?= $e($t('analytics.title')) ?></h2><p><?= $e($t('analytics.copy')) ?></p></div>
+    <div class="analytics-consent-actions"><button class="button button-ghost" type="button" data-analytics-reject><?= $e($t('analytics.reject')) ?></button><button class="button button-primary" type="button" data-analytics-accept><?= $e($t('analytics.accept')) ?></button></div>
+</section>
+<button class="analytics-settings" type="button" aria-label="<?= $e($t('analytics.settings')) ?>" title="<?= $e($t('analytics.settings')) ?>" data-analytics-settings hidden><?= $icon('chart-line') ?></button>
+<?php endif; ?>
 <script src="<?= $e($asset('assets/js/site.min.js')) ?>" defer></script>
 </body></html>

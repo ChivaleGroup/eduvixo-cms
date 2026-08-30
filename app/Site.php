@@ -57,6 +57,7 @@ final class Site
         $ogLocales = ['zh' => 'zh_CN', 'en' => 'en_US', 'de' => 'de_DE', 'lo' => 'lo_LA', 'pl' => 'pl_PL', 'th' => 'th_TH', 'vi' => 'vi_VN'];
         $structuredData = $this->structuredData($page, $meta, $canonicalUrl);
         $demoUrl = $this->config['demo_url'];
+        $analyticsId = preg_match('/^G-[A-Z0-9]{6,20}$/D', strtoupper((string) ($this->config['google_analytics_id'] ?? '')), $analyticsMatch) ? $analyticsMatch[0] : '';
         $csrf = $this->csrf();
         $state = $this->state;
         $needsSystemDetection = $this->pathLocale() === null && !isset($_COOKIE['eduvixo_language'], $_COOKIE['eduvixo_system_language']) && $this->acceptLanguage((string) ($_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '')) === null;
@@ -131,7 +132,7 @@ final class Site
         catch (\JsonException) { $this->jsonError((string) $this->t('marketplace.license_request_error'), 400); }
         if (!is_array($input) || !$this->validCsrf(isset($input['csrf']) && is_string($input['csrf']) ? $input['csrf'] : null)) $this->jsonError((string) $this->t('marketplace.license_request_error'), 403);
         try {
-            $result = $this->marketplaceService()->issueLicensedBrowserToken((string) ($input['package'] ?? ''), (string) ($input['license'] ?? ''), $this->clientIp(), $this->userAgent());
+            $result = $this->marketplaceService()->issueLicensedBrowserToken((string) ($input['package'] ?? ''), (string) ($input['license'] ?? ''), $this->clientIp(), $this->userAgent(), (string) ($input['variant'] ?? ''));
             if (!empty($result['ok'])) $this->json(['ok' => true, 'download_url' => $result['download_url'], 'message' => $this->t('marketplace.license_success')]);
             if (!empty($result['locked'])) $this->jsonError((string) $this->t('marketplace.license_locked'), 429, ['code' => 'locked', 'locked' => true, 'retry_after' => (int) $result['retry_after']]);
             $message = str_replace('{count}', (string) $result['remaining'], (string) $this->t('marketplace.license_invalid'));
@@ -271,7 +272,7 @@ final class Site
         header('X-Content-Type-Options: nosniff');
         header('X-Frame-Options: SAMEORIGIN');
         header('Permissions-Policy: camera=(), microphone=(), geolocation=(self)');
-        header("Content-Security-Policy: default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self' 'nonce-{$this->nonce}'; connect-src 'self'; font-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'");
+        header("Content-Security-Policy: default-src 'self'; img-src 'self' data: https://www.google-analytics.com; style-src 'self'; script-src 'self' 'nonce-{$this->nonce}' https://www.googletagmanager.com; connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://region1.analytics.google.com; font-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'");
     }
 
     private function requestPath(): string

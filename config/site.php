@@ -24,6 +24,7 @@ return [
     'demo_url' => rtrim($env('SITE_DEMO_URL', 'https://demo.eduvixo.com'), '/'),
     'contact_recipient' => $env('SITE_CONTACT_RECIPIENT', 'info@eduvixo.com'),
     'google_site_verification' => $env('SITE_GOOGLE_VERIFICATION'),
+    'google_analytics_id' => $env('SITE_GOOGLE_ANALYTICS_ID', 'G-CCZKQZHM4S'),
     'rate_key' => $env('SITE_RATE_KEY', hash('sha256', $root)),
     'marketplace' => require __DIR__ . '/marketplace.php',
     'languages' => [

@@ -22,8 +22,8 @@ try{
     $db->exec('INSERT INTO user_roles(user_id,role_id) VALUES(1,1)');$db->exec('INSERT INTO settings(`key`,value) VALUES("core_preservation_test","\"keep-this-school-data\"")');
     mkdir($fixture.'/config',0700);file_put_contents($fixture.'/config/app.php','<?php return [];');mkdir($fixture.'/themes',0755);file_put_contents($fixture.'/themes/school.txt','preserve theme');mkdir($fixture.'/storage',0700);file_put_contents($fixture.'/storage/uploads.txt','preserve uploaded data');
     $updater=new App\Core\SystemUpdate($db,$fixture,$config);$catalog=App\Core\OfficialCatalog::verify(file_get_contents($candidate.'/official-catalog.json'));$release=$catalog['core'];$archive=$candidate.'/eduvixo-core-'.$release['version'].'.zip';
-    $assert(count($catalog['products'])===11,'official catalog has all website products');
-    foreach(['en','de','zh','vi','th','lo','pl'] as $locale)$assert(count(array_filter($catalog['products'],static fn($p)=>!empty($p['copy'][$locale]['description'])))===11,'all descriptions present: '.$locale);
+    $assert(count($catalog['products'])===12,'official catalog has all website products');
+    foreach(['en','de','zh','vi','th','lo','pl'] as $locale)$assert(count(array_filter($catalog['products'],static fn($p)=>!empty($p['copy'][$locale]['description'])))===12,'all descriptions present: '.$locale);
     $assert(count($updater->verifyArchive($archive,$release)['files'])>100,'real signed core archive verifies');
     $reject(static fn()=>App\Core\OfficialCatalog::verify('{"signed_payload":"e30=","signature":"bad"}'),'forged catalog rejected');
     foreach(['../config/app.php','config/app.php','.env','themes/brand.php','plugins/tool.php','public/uploads/exploit.php','app/../config/app.php','app\\evil.php'] as $path)$assert(!App\Core\SystemUpdate::allowed($path),'protected path rejected: '.$path);
