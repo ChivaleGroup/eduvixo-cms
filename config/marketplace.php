@@ -25,8 +25,8 @@ return [
             'meta_keys' => ['marketplace.cms_price'],
         ],
         '56b33a4022d3ae4e11150c080f3e6189' => [
-            'type' => 'theme', 'slug' => 'eduvixo', 'name' => 'Eduvixo', 'version' => '1.1.7', 'size' => 1565719,
-            'file' => $packageRoot . '/eduvixo-theme-1.1.7.zip', 'checksum' => '8d24652b64c70e21386a675b9670d5c7a6a9d21b3a039d49c2377437ddd54bb6',
+            'type' => 'theme', 'slug' => 'eduvixo', 'name' => 'Eduvixo', 'version' => '1.1.8', 'size' => 1565727,
+            'file' => $packageRoot . '/eduvixo-theme-1.1.8.zip', 'checksum' => '1e43d238720db9d8692f688acd4e281aeaba56cc09e02de7ab8f49eaf723bc21',
             'browser_enabled' => false, 'license_download_enabled' => true, 'update_enabled' => true, 'system_installable' => true, 'icon' => 'layout', 'copy_key' => 'marketplace.eduvixo_copy',
         ],
         '60f0067c95f1e2719a97e66c7b78633c' => [

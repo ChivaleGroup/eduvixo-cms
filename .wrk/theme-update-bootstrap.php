@@ -7,6 +7,7 @@ $root = rtrim((string) ($argv[1] ?? ''), '/');
 $package = (string) ($argv[2] ?? '');
 $expected = (string) ($argv[3] ?? '1.1.7');
 if (!is_file($root . '/config/app.php') || !is_file($package)) throw new RuntimeException('Theme update inputs are unavailable.');
+foreach (array_keys(getenv()) as $key) if (str_starts_with($key, 'CMS_')) putenv($key);
 spl_autoload_register(static function (string $class) use ($root): void {
     if (!str_starts_with($class, 'App\\')) return;
     $file = $root . '/app/' . str_replace('\\', '/', substr($class, 4)) . '.php';
