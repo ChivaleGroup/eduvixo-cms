@@ -5,6 +5,7 @@
 !.cfg/README.md
 .cms/
 .doc/
+.plugins/
 storage/*
 !storage/.gitkeep
 tmp/

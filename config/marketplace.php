@@ -33,6 +33,13 @@ return [
             'file' => $packageRoot . '/shoudu-theme-1.1.1.zip', 'checksum' => '04e60ff5e3dd659cb41e914b3c5acbc008cdd2687a12f6b0355fe37c86aa9ee8',
             'browser_enabled' => false, 'license_download_enabled' => true, 'update_enabled' => false, 'icon' => 'graduation-cap', 'copy_key' => 'marketplace.shoudu_copy',
         ],
+        '7f197682f4a6ab6bdde11578611ae511' => [
+            'type' => 'plugin', 'slug' => 'ifirewall', 'name' => 'iFirewall', 'version' => '1.0.0', 'size' => 37193,
+            'file' => $packageRoot . '/ifirewall-php-1.0.0.zip', 'checksum' => 'b70d4aee3303dbd55afa07112e650320fe5aac2bccda58d4daeb18385044c1a1',
+            'browser_enabled' => false, 'license_download_enabled' => true, 'update_enabled' => false, 'icon' => 'shield-check', 'copy_key' => 'marketplace.ifirewall_copy',
+            'meta_keys' => ['marketplace.ifirewall_price', 'marketplace.php_85'], 'card_class' => 'is-premium-plugin',
+            'license_product_name' => 'iFirewall', 'license_product_model' => 'PHP Security & IP Firewall', 'license_product_version' => '1.0.0',
+        ],
         'e0250d15236f4c57ad2f32ff16e129e3' => [
             'type' => 'application', 'slug' => 'eduvixo-windows', 'name' => 'Eduvixo for Windows', 'version' => '0.2.1',
             'browser_enabled' => true, 'license_download_enabled' => false, 'update_enabled' => false, 'icon' => 'devices',

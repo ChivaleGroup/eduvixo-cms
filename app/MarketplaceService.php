@@ -27,6 +27,7 @@ final class MarketplaceService
                 'licensed' => (bool) ($package['license_download_enabled'] ?? false), 'locked' => $licenseState['locked'],
                 'icon' => $package['icon'], 'copy_key' => $package['copy_key'], 'variants' => $variants,
                 'meta_keys' => (array) ($package['meta_keys'] ?? []), 'note_key' => (string) ($package['note_key'] ?? ''),
+                'card_class' => preg_match('/^[a-z0-9-]{1,60}$/D', (string) ($package['card_class'] ?? '')) ? (string) $package['card_class'] : '',
             ];
         }
         return $items;
@@ -48,7 +49,7 @@ final class MarketplaceService
         $licenseKey = trim($licenseKey);
         $maximum = (int) $this->config['license_key_max_length'];
         $validFormat = $licenseKey !== '' && strlen($licenseKey) <= $maximum && preg_match('/^[A-Za-z0-9._-]+$/D', $licenseKey) === 1;
-        if (!$validFormat || !$this->validateBrowserLicense($licenseKey)) {
+        if (!$validFormat || !$this->validateBrowserLicense($licenseKey, $package)) {
             $state = $this->recordLicenseFailure($ip);
             return ['ok' => false, 'locked' => $state['locked'], 'remaining' => max(0, (int) $this->config['license_failure_limit'] - $state['attempts']), 'retry_after' => $state['retry_after']];
         }
@@ -154,9 +155,14 @@ final class MarketplaceService
         return '/download/file/?token=' . rawurlencode($token);
     }
 
-    private function validateBrowserLicense(string $licenseKey): bool
+    private function validateBrowserLicense(string $licenseKey, array $package): bool
     {
-        $payload = http_build_query(['type' => 'software', 'LicenseKey' => $licenseKey, 'DomainUrl' => $this->baseUrl, 'ProductName' => $this->config['license_product_name'], 'ProductModel' => $this->config['license_product_model'], 'ProductVersion' => $this->config['license_product_version']], '', '&', PHP_QUERY_RFC3986);
+        $payload = http_build_query([
+            'type' => 'software', 'LicenseKey' => $licenseKey, 'DomainUrl' => $this->baseUrl,
+            'ProductName' => (string) ($package['license_product_name'] ?? $this->config['license_product_name']),
+            'ProductModel' => (string) ($package['license_product_model'] ?? $this->config['license_product_model']),
+            'ProductVersion' => (string) ($package['license_product_version'] ?? $this->config['license_product_version']),
+        ], '', '&', PHP_QUERY_RFC3986);
         $curl = curl_init((string) $this->config['license_endpoint']);
         if ($curl === false) throw new \RuntimeException('License service is unavailable.', 503);
         curl_setopt_array($curl, [CURLOPT_POST => true, CURLOPT_POSTFIELDS => $payload, CURLOPT_HTTPHEADER => ['Content-Type: application/x-www-form-urlencoded', 'Accept: application/json'], CURLOPT_USERAGENT => 'Eduvixo-Marketplace/1.0', CURLOPT_RETURNTRANSFER => true, CURLOPT_CONNECTTIMEOUT => 5, CURLOPT_TIMEOUT => 12, CURLOPT_FOLLOWLOCATION => false, CURLOPT_PROTOCOLS => CURLPROTO_HTTPS, CURLOPT_REDIR_PROTOCOLS => CURLPROTO_HTTPS]);

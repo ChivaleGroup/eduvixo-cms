@@ -21,7 +21,7 @@ $hasLicensedDownloads = (bool) array_filter($releases, static fn(array $release)
                 $licensed = !$release['enabled'] && $release['licensed'];
                 $variants = (array) ($release['variants'] ?? []);
             ?>
-                <article class="<?= $release['enabled'] ? 'is-downloadable' : ($licensed ? 'is-licensed' : 'is-listed') ?><?= $variants ? ' is-variant-product' : '' ?>">
+                <article class="<?= $release['enabled'] ? 'is-downloadable' : ($licensed ? 'is-licensed' : 'is-listed') ?><?= $variants ? ' is-variant-product' : '' ?><?= $release['card_class'] !== '' ? ' ' . $e($release['card_class']) : '' ?>">
                     <div class="release-top">
                         <div class="feature-icon"><?= $icon($release['icon']) ?></div>
                         <span><?= $e($t('marketplace.types.' . $release['type'], ucfirst($release['type']))) ?></span>
@@ -32,7 +32,7 @@ $hasLicensedDownloads = (bool) array_filter($releases, static fn(array $release)
                         <span>v<?= $e($release['version']) ?></span>
                         <?php if ($release['enabled'] || $licensed): ?>
                             <?php if ($release['size'] !== ''): ?><span><?= $e($release['size']) ?></span><?php endif; ?>
-                            <?php foreach ((array) ($release['meta_keys'] ?? []) as $metaKey): ?><span><?= $e($t((string) $metaKey)) ?></span><?php endforeach; ?>
+                            <?php foreach ((array) ($release['meta_keys'] ?? []) as $metaKey): ?><span<?= str_ends_with((string) $metaKey, '_price') ? ' class="is-price"' : '' ?>><?= $e($t((string) $metaKey)) ?></span><?php endforeach; ?>
                             <?php if (!$variants): ?><span><?= $e($t('marketplace.stable')) ?></span><?php endif; ?>
                         <?php else: ?>
                             <span><?= $e($t('marketplace.listed')) ?></span>
