@@ -218,25 +218,7 @@
         </Grid>
 
         <Grid x:Name="BrowserView" Visibility="Collapsed" Background="White">
-            <Grid.RowDefinitions><RowDefinition Height="62" /><RowDefinition Height="*" /></Grid.RowDefinitions>
-            <Border Grid.Row="0" Background="#041434" BorderBrush="#17325F" BorderThickness="0,0,0,1">
-                <Grid Margin="14,0">
-                    <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                    <Image Width="116" Margin="4,0,18,0" Source="Assets/eduvixo-logo.png" Stretch="Uniform" />
-                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                        <Button x:Name="LauncherButton" Width="38" Style="{StaticResource ToolbarButtonStyle}" ToolTip="Start" Click="LauncherButton_Click" Content="⌂" />
-                        <Button x:Name="BackButton" Width="38" Style="{StaticResource ToolbarButtonStyle}" ToolTip="Back" Click="BackButton_Click" Content="←" />
-                        <Button x:Name="ForwardButton" Width="38" Style="{StaticResource ToolbarButtonStyle}" ToolTip="Forward" Click="ForwardButton_Click" Content="→" />
-                        <Button x:Name="RefreshButton" Width="38" Style="{StaticResource ToolbarButtonStyle}" ToolTip="Refresh" Click="RefreshButton_Click" Content="↻" />
-                    </StackPanel>
-                    <Border Grid.Column="2" Height="36" Margin="10,0,14,0" VerticalAlignment="Center" Background="#0E2852" BorderBrush="#294A79" BorderThickness="1" CornerRadius="10">
-                        <StackPanel Margin="12,0" Orientation="Horizontal" VerticalAlignment="Center"><Ellipse Width="7" Height="7" Margin="0,0,8,0" Fill="#42C894" /><TextBlock x:Name="BrowserAddress" VerticalAlignment="Center" Foreground="#C7D8EF" FontSize="12" Text="demo.eduvixo.com" /></StackPanel>
-                    </Border>
-                    <Button Grid.Column="3" x:Name="BrowserWebsiteButton" MinWidth="136" Style="{StaticResource ToolbarButtonStyle}" Click="WebsiteButton_Click" />
-                </Grid>
-            </Border>
-
-            <Grid Grid.Row="1">
+            <Grid>
                 <wv2:WebView2 x:Name="Browser" DefaultBackgroundColor="White" />
                 <Border x:Name="LoadingOverlay" Background="#F7FAFE">
                     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">

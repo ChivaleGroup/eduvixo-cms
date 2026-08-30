@@ -6,7 +6,7 @@
     <AssemblyName>eduvixo</AssemblyName>
     <RootNamespace>Eduvixo.Windows</RootNamespace>
     <ApplicationIcon>app.ico</ApplicationIcon>
-    <Version>0.2.2</Version>
+    <Version>0.2.3</Version>
     <Authors>Eduvixo &amp; QUANT Software House</Authors>
     <Company>Eduvixo</Company>
     <Product>Eduvixo</Product>
@@ -22,6 +22,7 @@
     <PublishReadyToRun>true</PublishReadyToRun>
     <PublishTrimmed>false</PublishTrimmed>
     <DebugType>embedded</DebugType>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     <InvariantGlobalization>false</InvariantGlobalization>
     <AllowedReferenceRelatedFileExtensions></AllowedReferenceRelatedFileExtensions>
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>

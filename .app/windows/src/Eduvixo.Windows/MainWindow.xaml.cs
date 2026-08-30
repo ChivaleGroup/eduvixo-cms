@@ -72,7 +72,6 @@ public partial class MainWindow : Window
         UnavailableBadge.Text = LocalizationService.Get("comingSoon");
         RememberChoiceCheckBox.Content = LocalizationService.Get("rememberChoice");
         WebsiteButton.Content = LocalizationService.Get("officialWebsite");
-        BrowserWebsiteButton.Content = LocalizationService.Get("officialWebsite");
         LoadingText.Text = LocalizationService.Get("loading");
         ErrorLauncherButton.Content = LocalizationService.Get("backToStart");
         LoginBackButton.Content = $"← {LocalizationService.Get("backToStart")}";
@@ -89,10 +88,6 @@ public partial class MainWindow : Window
         RefreshCaptchaButton.Content = LocalizationService.Get("refreshCaptcha");
         DemoAccessNote.Text = LocalizationService.Get("demoAccessNote");
         LoginSubmitButton.Content = LocalizationService.Get("signIn");
-        LauncherButton.ToolTip = LocalizationService.Get("backToStart");
-        BackButton.ToolTip = LocalizationService.Get("back");
-        ForwardButton.ToolTip = LocalizationService.Get("forward");
-        RefreshButton.ToolTip = LocalizationService.Get("refresh");
         OfflineButton.ToolTip = LocalizationService.Get("offlineUnavailable");
 
         AutomationProperties.SetName(OnlineButton, LocalizationService.Get("onlineTitle"));
@@ -242,8 +237,6 @@ public partial class MainWindow : Window
 
             Browser.CoreWebView2.NavigationStarting += Browser_NavigationStarting;
             Browser.CoreWebView2.NavigationCompleted += Browser_NavigationCompleted;
-            Browser.CoreWebView2.HistoryChanged += Browser_HistoryChanged;
-            Browser.CoreWebView2.SourceChanged += Browser_SourceChanged;
             Browser.CoreWebView2.NewWindowRequested += Browser_NewWindowRequested;
             Browser.CoreWebView2.ProcessFailed += Browser_ProcessFailed;
 
@@ -302,21 +295,10 @@ public partial class MainWindow : Window
         if (e.IsSuccess)
         {
             ErrorOverlay.Visibility = Visibility.Collapsed;
-            UpdateNavigationState();
             return;
         }
 
         ShowError(false, $"{LocalizationService.Get("connectionDescription")} ({e.WebErrorStatus})");
-    }
-
-    private void Browser_HistoryChanged(object? sender, object e) => UpdateNavigationState();
-
-    private void Browser_SourceChanged(object? sender, CoreWebView2SourceChangedEventArgs e)
-    {
-        if (Uri.TryCreate(Browser.Source?.AbsoluteUri, UriKind.Absolute, out var uri))
-        {
-            BrowserAddress.Text = uri.Host;
-        }
     }
 
     private void Browser_NewWindowRequested(object? sender, CoreWebView2NewWindowRequestedEventArgs e)
@@ -327,28 +309,13 @@ public partial class MainWindow : Window
             return;
         }
 
-        if (IsEduvixoUri(uri))
-        {
-            Browser.CoreWebView2.Navigate(uri.AbsoluteUri);
-        }
-        else if (uri.Scheme == Uri.UriSchemeHttps)
+        if (uri.Scheme == Uri.UriSchemeHttps)
         {
             OpenExternal(uri);
         }
     }
 
     private void Browser_ProcessFailed(object? sender, CoreWebView2ProcessFailedEventArgs e) => ShowError(false);
-
-    private void UpdateNavigationState()
-    {
-        if (!_browserInitialized)
-        {
-            return;
-        }
-
-        BackButton.IsEnabled = Browser.CoreWebView2.CanGoBack;
-        ForwardButton.IsEnabled = Browser.CoreWebView2.CanGoForward;
-    }
 
     private void ShowError(bool runtimeMissing, string? description = null)
     {
@@ -520,30 +487,6 @@ public partial class MainWindow : Window
         }
 
         return LocalizationService.Get("loginUnexpectedError");
-    }
-
-    private void BackButton_Click(object sender, RoutedEventArgs e)
-    {
-        if (_browserInitialized && Browser.CoreWebView2.CanGoBack)
-        {
-            Browser.CoreWebView2.GoBack();
-        }
-    }
-
-    private void ForwardButton_Click(object sender, RoutedEventArgs e)
-    {
-        if (_browserInitialized && Browser.CoreWebView2.CanGoForward)
-        {
-            Browser.CoreWebView2.GoForward();
-        }
-    }
-
-    private void RefreshButton_Click(object sender, RoutedEventArgs e)
-    {
-        if (_browserInitialized)
-        {
-            Browser.CoreWebView2.Reload();
-        }
     }
 
     private async void RetryButton_Click(object sender, RoutedEventArgs e)

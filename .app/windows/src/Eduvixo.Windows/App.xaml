@@ -10,33 +10,6 @@
         <SolidColorBrush x:Key="MutedBrush" Color="#60708A" />
         <SolidColorBrush x:Key="LineBrush" Color="#DCE7F5" />
 
-        <Style x:Key="ToolbarButtonStyle" TargetType="Button">
-            <Setter Property="MinWidth" Value="38" />
-            <Setter Property="Height" Value="38" />
-            <Setter Property="Padding" Value="10,6" />
-            <Setter Property="Margin" Value="0,0,6,0" />
-            <Setter Property="Foreground" Value="White" />
-            <Setter Property="Background" Value="#17305A" />
-            <Setter Property="BorderBrush" Value="#34517E" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="FontSize" Value="14" />
-            <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="Chrome" Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="10">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Chrome" Property="Background" Value="#21447A" /></Trigger>
-                            <Trigger Property="IsPressed" Value="True"><Setter TargetName="Chrome" Property="Background" Value="#0E254D" /></Trigger>
-                            <Trigger Property="IsEnabled" Value="False"><Setter TargetName="Chrome" Property="Opacity" Value="0.42" /></Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
         <Style x:Key="PrimaryButtonStyle" TargetType="Button">
             <Setter Property="MinHeight" Value="48" />
             <Setter Property="Padding" Value="20,11" />

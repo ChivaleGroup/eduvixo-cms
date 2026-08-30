@@ -17,6 +17,24 @@ $mainWindow = [xml](Get-Content -LiteralPath (Join-Path $root 'src\Eduvixo.Windo
 if ($mainWindow.Window.WindowState -ne 'Maximized') {
     throw 'The application must open maximized.'
 }
+if ($mainWindow.SelectSingleNode("//*[local-name()='Grid' and @*[local-name()='Name']='BrowserView']/*[local-name()='Grid']/*[local-name()='WebView2' and @*[local-name()='Name']='Browser']") -eq $null) {
+    throw 'The WebView must fill the browser workspace directly.'
+}
+$removedBrowserControls = @('BrowserWebsiteButton', 'BrowserAddress', 'LauncherButton', 'BackButton', 'ForwardButton', 'RefreshButton')
+foreach ($controlName in $removedBrowserControls) {
+    if ($mainWindow.SelectSingleNode("//*[@*[local-name()='Name']='$controlName']")) {
+        throw "The removed browser toolbar control must not return: $controlName"
+    }
+}
+
+$mainWindowSource = Get-Content -LiteralPath (Join-Path $root 'src\Eduvixo.Windows\MainWindow.xaml.cs') -Raw
+$newWindowHandler = [regex]::Match(
+    $mainWindowSource,
+    '(?s)private void Browser_NewWindowRequested.*?(?=private void Browser_ProcessFailed)'
+).Value
+if (-not $newWindowHandler.Contains('OpenExternal(uri);') -or $newWindowHandler.Contains('Browser.CoreWebView2.Navigate')) {
+    throw 'New-window links must open through the default Windows browser.'
+}
 
 $tokens = $null
 $parseErrors = $null
@@ -41,4 +59,4 @@ try {
     Pop-Location
 }
 
-Write-Output "Verified maximized startup, $($expectedKeys.Count) localization keys across 7 languages, signing script syntax and a warning-free Release build."
+Write-Output "Verified maximized toolbar-free workspace, $($expectedKeys.Count) localization keys across 7 languages, signing script syntax and a warning-free Release build."
