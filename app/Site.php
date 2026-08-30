@@ -17,14 +17,10 @@ final class Site
     private array $state = [];
     private string $locale;
     private string $nonce;
+    private bool $sessionStarted = false;
 
     public function __construct(private readonly array $config)
     {
-        if (session_status() !== PHP_SESSION_ACTIVE) {
-            session_name('eduvixo_site');
-            session_set_cookie_params(['httponly' => true, 'samesite' => 'Lax', 'secure' => $this->secure(), 'path' => '/']);
-            session_start();
-        }
         $this->locale = $this->detectLocale();
         $this->copy = $this->loadCopy($this->locale);
         $this->nonce = rtrim(strtr(base64_encode(random_bytes(18)), '+/', '-_'), '=');
@@ -58,17 +54,17 @@ final class Site
         $structuredData = $this->structuredData($page, $meta, $canonicalUrl);
         $demoUrl = $this->config['demo_url'];
         $analyticsId = preg_match('/^G-[A-Z0-9]{6,20}$/D', strtoupper((string) ($this->config['google_analytics_id'] ?? '')), $analyticsMatch) ? $analyticsMatch[0] : '';
-        $csrf = $this->csrf();
+        $csrf = in_array($page, ['contact', 'marketplace'], true) ? $this->csrf() : '';
         $state = $this->state;
         $needsSystemDetection = $this->pathLocale() === null && !isset($_COOKIE['eduvixo_language'], $_COOKIE['eduvixo_system_language']) && $this->acceptLanguage((string) ($_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '')) === null;
-        $this->headers();
+        $this->headers($page);
         require $this->config['root'] . '/app/views/layout.php';
         exit;
     }
 
     public function locale(): string { return $this->locale; }
     public function config(): array { return $this->config; }
-    public function csrf(): string { return $_SESSION['csrf'] ??= bin2hex(random_bytes(24)); }
+    public function csrf(): string { $this->startSession(); return $_SESSION['csrf'] ??= bin2hex(random_bytes(24)); }
     public function validCsrf(?string $token): bool { return is_string($token) && hash_equals($this->csrf(), $token); }
 
     public function dispatch(): never
@@ -82,6 +78,7 @@ final class Site
 
     public function contact(): never
     {
+        $this->startSession();
         if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
             require_once __DIR__ . '/Mailer.php';
             require_once __DIR__ . '/ContactService.php';
@@ -89,6 +86,7 @@ final class Site
             $this->state = $service->submit($_POST, $this->validCsrf($_POST['csrf'] ?? null), $this->locale, fn(string $key, mixed $fallback = ''): mixed => $this->t($key, $fallback));
             if (!empty($this->state['success'])) {
                 $_SESSION['contact_success'] = true;
+                $this->noStore();
                 header('Location: ' . $this->routePath('contact', $this->locale) . '?sent=1', true, 303);
                 exit;
             }
@@ -101,6 +99,7 @@ final class Site
 
     public function marketplace(): never
     {
+        $this->startSession();
         $this->state = ['marketplace_items' => $this->marketplaceService()->publicItems($this->clientIp())];
         if (!empty($_SESSION['marketplace_error'])) { unset($_SESSION['marketplace_error']); $this->state['download_error'] = true; }
         $this->render('marketplace');
@@ -109,6 +108,7 @@ final class Site
     public function requestDownload(): never
     {
         if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') $this->plain('Method not allowed.', 405);
+        $this->noStore();
         if (!$this->validCsrf($_POST['csrf'] ?? null)) { $_SESSION['marketplace_error'] = true; header('Location: ' . $this->routePath('marketplace', $this->locale), true, 303); exit; }
         try {
             $location = $this->marketplaceService()->issueBrowserToken((string) ($_POST['package'] ?? ''), (string) ($_POST['variant'] ?? ''), $this->clientIp(), $this->userAgent());
@@ -167,6 +167,7 @@ final class Site
         }
         $target = (string) ($_GET['return'] ?? '/');
         if (!str_starts_with($target, '/') || str_starts_with($target, '//') || str_contains($target, "\r") || str_contains($target, "\n")) $target = '/';
+        $this->noStore();
         header('Location: ' . $target, true, 303);
         exit;
     }
@@ -265,9 +266,23 @@ final class Site
         return $value;
     }
 
-    private function headers(): void
+    private function startSession(): void
+    {
+        if ($this->sessionStarted) return;
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            session_name('eduvixo_site');
+            session_set_cookie_params(['httponly' => true, 'samesite' => 'Lax', 'secure' => $this->secure(), 'path' => '/']);
+            session_cache_limiter('');
+            if (!session_start()) throw new \RuntimeException('Cannot start the secure website session.');
+        }
+        $this->sessionStarted = true;
+    }
+
+    private function headers(string $page): void
     {
         header('Content-Type: text/html; charset=utf-8');
+        $cacheable = ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET' && !$this->sessionStarted && !in_array($page, ['contact', 'marketplace'], true);
+        header($cacheable ? 'Cache-Control: private, max-age=300, stale-while-revalidate=60' : 'Cache-Control: private, no-store, no-cache, must-revalidate, max-age=0');
         header('Referrer-Policy: strict-origin-when-cross-origin');
         header('X-Content-Type-Options: nosniff');
         header('X-Frame-Options: SAMEORIGIN');
@@ -291,8 +306,14 @@ final class Site
         if ($path === '') $path = '/';
         if ($path === $target && !$hasLanguageQuery) return;
         if ($page === 'contact' && (string) ($_GET['sent'] ?? '') === '1') $target .= '?sent=1';
+        $this->noStore();
         header('Location: ' . $target, true, $hasLanguageQuery || $this->pathLocale() !== null ? 301 : 302);
         exit;
+    }
+
+    private function noStore(): void
+    {
+        header('Cache-Control: private, no-store, no-cache, must-revalidate, max-age=0');
     }
 
     private function routePath(string $page, string $locale): string

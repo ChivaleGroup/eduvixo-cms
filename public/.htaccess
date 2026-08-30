@@ -14,7 +14,7 @@ RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
     <FilesMatch "\.(?:css|js|svg|ico|png|jpe?g|webp|woff2?)$">
         Header set Cache-Control "public, max-age=2592000, immutable"
     </FilesMatch>
-    <FilesMatch "\.(?:php|json)$">
+    <FilesMatch "\.json$">
         Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
     </FilesMatch>
 </IfModule>
