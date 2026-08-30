@@ -80,3 +80,10 @@ Rollback: stop/remove this specific new cron entry first, preserve current DB an
 Operator checks: `.wrk/calendar-marketplace-verify.php`, `.wrk/calendar-integration-tests.php`, `.wrk/calendar-provider-security-tests.php`, `.wrk/calendar-audit.php`. The local `.wrk/calendar-ui-check.php` is an isolated view fixture, never a production route. Private CMS/plugin source stays outside public Git by policy; retain the new private source archive as well as the original Beta snapshot.
 
 Provider references used: Google Calendar create-events and insert API guides; Microsoft Graph create-event/event `transactionId` documentation; Meta's official Postman WhatsApp template-message example; Apple Support app-specific-password documentation. No third-party runtime dependency added.
+
+## Final checkpoint
+
+- Website, tooling and recovery documentation committed and pushed to `origin/main`: `f761fabf1e5ce1696ff3b33ac972e77e68453720`.
+- Additional private local backup: `F:\Git\ChivaleGroup\.backups\eduvixo-calendar-beta-local-20260830-082000.tar.gz`, 460203962 bytes, SHA256 `d5943d6ebe3223f3756a55334c951c7e930977691f2ce0a62c4a48e3b4c6168a`.
+- Archive contains the current project including ignored CMS/plugin sources, configuration/signing key and Git; excludes only regenerable `tmp/`. Tar listing completed successfully and explicitly confirmed CalendarRepository and the signing-key file. This backup is confidential and must remain outside the web root/public Git.
+- Local UI test server stopped. Cron log permissions normalized to 0640 and cron uses umask 027.
