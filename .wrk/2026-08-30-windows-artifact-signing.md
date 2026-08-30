@@ -2,7 +2,7 @@
 
 Date: 2026-08-30
 Environment: local Windows workstation and Microsoft Azure
-Status: identity validation requires Verified ID presentation
+Status: Azure signing infrastructure ready
 
 ## Azure state
 
@@ -10,9 +10,9 @@ Status: identity validation requires Verified ID presentation
 - Updated Microsoft Artifact Signing terms dated 2026-05-04 were accepted by the authorized account holder.
 - The current identity has the `Artifact Signing Identity Verifier` role at the Artifact Signing account scope.
 - A Public organization identity validation for Chivale Group LTD was submitted.
-- Microsoft changed the validation status to `Action Required` and requested presentation of a Microsoft Entra Verified ID through Microsoft Authenticator. If the requester does not already have a Verified ID, the Microsoft page offers verification through a trusted identity verifier.
-- The requester successfully presented the Verified ID. The Microsoft Credentials page confirms `Verification successful`; the Artifact Signing resource still reports `Action Required` while the result propagates to the validation service.
-- No certificate profile can be created until Microsoft changes the identity validation status to `Completed`.
+- The requester successfully presented the Microsoft Entra Verified ID and Microsoft changed the Public organization identity validation status to `Completed`.
+- Created the active `Public Trust` certificate profile `EduvixoPublicTrust` for `CN=Chivale Group LTD, O=Chivale Group LTD, L=London, C=GB`.
+- Assigned `Artifact Signing Certificate Profile Signer` to the release identity at the Artifact Signing account scope. Azure IAM confirms the assignment for Mario Chivale on resource `Chivale`.
 
 No tax identifiers, business identifiers, personal data, access tokens, credentials or certificate material are recorded in this document or committed to Git.
 
@@ -33,8 +33,5 @@ No tax identifiers, business identifiers, personal data, access tokens, credenti
 
 ## Remaining steps
 
-1. Wait for Public identity validation status `Completed`.
-2. Create one `Public Trust` certificate profile named `EduvixoPublicTrust`.
-3. Assign `Artifact Signing Certificate Profile Signer` to the release identity at the narrowest practical scope.
-4. Run `scripts/sign-release.ps1 -Version 0.2.2 -ProfileName EduvixoPublicTrust -InteractiveBrowser`.
-5. Verify both executables, publish them through the protected Marketplace flow, and retain the unsigned `0.2.1` artifacts for rollback until the signed release is confirmed.
+1. Run `scripts/sign-release.ps1 -Version 0.2.2 -ProfileName EduvixoPublicTrust -InteractiveBrowser`.
+2. Verify both executables, publish them through the protected Marketplace flow, and retain the unsigned `0.2.1` artifacts for rollback until the signed release is confirmed.
