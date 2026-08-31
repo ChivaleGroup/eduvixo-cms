@@ -10,6 +10,8 @@ storage/*
 !storage/.gitkeep
 tmp/
 /.wrk/notification-stage/
+/.wrk/shoudu-wcag-source/
+/.wrk/*lighthouse*.json
 *.log
 *.zip
 *.zip.sha*

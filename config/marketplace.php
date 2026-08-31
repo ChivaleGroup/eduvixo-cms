@@ -25,13 +25,13 @@ return [
             'meta_keys' => ['marketplace.cms_price'],
         ],
         '56b33a4022d3ae4e11150c080f3e6189' => [
-            'type' => 'theme', 'slug' => 'eduvixo', 'name' => 'Eduvixo', 'version' => '1.1.8', 'size' => 1565727,
-            'file' => $packageRoot . '/eduvixo-theme-1.1.8.zip', 'checksum' => '1e43d238720db9d8692f688acd4e281aeaba56cc09e02de7ab8f49eaf723bc21',
+            'type' => 'theme', 'slug' => 'eduvixo', 'name' => 'Eduvixo', 'version' => '1.1.9', 'size' => 1570175,
+            'file' => $packageRoot . '/eduvixo-theme-1.1.9.zip', 'checksum' => 'c4261ba1a8a9955539e4a7327b7e23abb983fa49cedcd1e0dcf9ca8d745603a4',
             'browser_enabled' => false, 'license_download_enabled' => true, 'update_enabled' => true, 'system_installable' => true, 'icon' => 'layout', 'copy_key' => 'marketplace.eduvixo_copy',
         ],
         '60f0067c95f1e2719a97e66c7b78633c' => [
-            'type' => 'theme', 'slug' => 'shoudu', 'name' => 'Shoudu', 'version' => '1.1.1', 'size' => 9450487,
-            'file' => $packageRoot . '/shoudu-theme-1.1.1.zip', 'checksum' => '04e60ff5e3dd659cb41e914b3c5acbc008cdd2687a12f6b0355fe37c86aa9ee8',
+            'type' => 'theme', 'slug' => 'shoudu', 'name' => 'Shoudu', 'version' => '1.1.3', 'size' => 9454591,
+            'file' => $packageRoot . '/shoudu-theme-1.1.3.zip', 'checksum' => '2d10a98eff9c0d938c7393192048bb57d8969700de1bfd53f64ad05c2c596387',
             'browser_enabled' => false, 'license_download_enabled' => true, 'update_enabled' => true, 'system_installable' => true, 'icon' => 'graduation-cap', 'copy_key' => 'marketplace.shoudu_copy',
         ],
         '7f197682f4a6ab6bdde11578611ae511' => [
