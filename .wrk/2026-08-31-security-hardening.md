@@ -80,6 +80,7 @@ Both files were new. Rollback removes them, runs `fail2ban-client -t`, reloads F
 - Apache configuration reports `Syntax OK`; the pre-existing `NameVirtualHost has no effect` notice is unrelated.
 - Production application error log showed no matching PHP fatal, warning or parse errors after verification traffic.
 - Git continues to track only `.cfg/README.md` and `storage/.gitkeep` from protected local areas. The random runtime secret remains ignored.
+- The repository Secret scan was found to be failing on two historical false positives for the public publisher identifier `chivale-eduvixo-2026`. Exact historical Gitleaks fingerprints are allowlisted in `.gitleaksignore`; no rule or directory is excluded, and all other findings remain blocking.
 
 ## Residual recommendation
 
