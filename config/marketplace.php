@@ -19,8 +19,8 @@ return [
     'license_product_version' => '1.0',
     'packages' => [
         'b843df54f8988bad5b884f54dceb7250' => [
-            'type' => 'system', 'slug' => 'eduvixo-cms', 'name' => 'Eduvixo CMS', 'version' => '1.0.1', 'size' => 10406984,
-            'file' => $packageRoot . '/eduvixo-install-1.0.1.zip', 'checksum' => 'fbbd9b8df946979ded70f60106e00668b0c17fe6df0642d070d78504e60bd519',
+            'type' => 'system', 'slug' => 'eduvixo-cms', 'name' => 'Eduvixo CMS', 'version' => '1.0.9', 'release_channel' => 'stable', 'size' => 10404304,
+            'file' => $packageRoot . '/eduvixo-install-1.0.9.zip', 'checksum' => '89ebf77e77f169afb26bd09af18faf94d549be5868765539a5a9b42db988eec1',
             'browser_enabled' => false, 'license_download_enabled' => true, 'update_enabled' => false, 'icon' => 'layers', 'copy_key' => 'marketplace.system_copy',
             'meta_keys' => ['marketplace.cms_price'],
         ],

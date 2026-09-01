@@ -17,7 +17,7 @@ try {
     for($i=1;$i<=4;$i++)$db->prepare('INSERT INTO users(id,name,username,email,password,active,is_demo,created_at,updated_at) VALUES(?,?,?,?,?,1,?,NOW(),NOW())')->execute([$i,'Test user '.$i,'test'.$i,'notification'.$i.'@example.invalid',bin2hex(random_bytes(32)),$i===4?1:0]);
     $db->exec('INSERT INTO user_roles(user_id,role_id) VALUES(1,1),(2,2),(3,2),(4,1)');
     $db->exec('INSERT INTO user_campuses(user_id,campus_id,created_at) VALUES(2,1,NOW()),(3,2,NOW())');
-    $sql($root.'/database/migrations/024_system_notifications.sql');$sql($root.'/database/migrations/024_system_notifications.sql');$assert(true,'additive migration is repeatable');
+    $sql($root.'/database/migrations/024_system_notifications.sql');$sql($root.'/database/migrations/024_system_notifications.sql');$sql($root.'/database/migrations/025_web_push.sql');$sql($root.'/database/migrations/025_web_push.sql');$assert(true,'additive migrations are repeatable');
     $db->exec('CREATE TABLE notification_test_receipts(id INT AUTO_INCREMENT PRIMARY KEY, recipient VARCHAR(50), title VARCHAR(180), body TEXT)');
     foreach(['telegram-notifications','whatsapp-notifications']as$slug){$manifest=json_decode(file_get_contents($root.'/plugins/'.$slug.'/plugin.json'),true);$db->prepare('INSERT INTO extension_packages(type,slug,name,version,publisher,active,manifest,install_path,installed_at,updated_at) VALUES("plugin",?,?,?,"Test",1,?,?,NOW(),NOW())')->execute([$slug,$manifest['name'],$manifest['version'],json_encode($manifest),'plugins/'.$slug]);}
     $config['secrets_key']=bin2hex(random_bytes(32));$config['base_url']='https://example.invalid';$config['license']['path']=$stage.'/empty-license';

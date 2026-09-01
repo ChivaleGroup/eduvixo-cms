@@ -65,6 +65,7 @@ $shell = (string) file_get_contents($root . '/.cms/source/public/theme/eduvixo-s
 $theme = (string) file_get_contents($root . '/.cms/source/themes/eduvixo/views/page.php');
 $assert(str_contains($backend, 'data-text-range') && str_contains($backend, 'aria-modal="true"'), 'backend Settings accessibility controls missing');
 $assert(str_contains($shell, 'syncTextScale') && str_contains($shell, 'workspace.inert = value'), 'backend scale or modal focus management missing');
+$assert(str_contains($shell, "querySelector('output[data-text-scale]')") && !str_contains($shell, "document.querySelector('[data-text-scale]')"), 'backend text scale output selector can target the document root');
 $assert(str_contains($theme, 'data-school-accessibility') && str_contains($theme, 'id="school-main-content"'), 'school accessibility controls or main target missing');
 
 if ($errors !== []) {
