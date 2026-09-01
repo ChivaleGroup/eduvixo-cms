@@ -5,11 +5,11 @@ $root=$argv[1]??dirname(__DIR__);$config=require $root.'/config/marketplace.php'
 foreach($config['packages']as$id=>$package){
     if(!str_contains($icons,'id="'.$package['icon'].'"'))throw new RuntimeException('Missing icon: '.$package['slug']);
     foreach(($package['variants']??[$package])as$variant){if(!is_file($variant['file'])||filesize($variant['file'])!==$variant['size']||!hash_equals($variant['checksum'],hash_file('sha256',$variant['file'])))throw new RuntimeException('Package integrity failure: '.$package['slug']);$count++;}
-    if(($package['release_channel']??'stable')==='beta'){
+    if(!empty($package['system_installable'])){
         $zip=new ZipArchive();if($zip->open($package['file'],ZipArchive::RDONLY)!==true)throw new RuntimeException('Unreadable package.');
         $raw=$zip->getFromName('eduvixo-package.json');$signature=base64_decode($zip->getFromName('signature.ed25519'),true);$public=base64_decode('q+WweIoNkskiUOzyLl80Bc9V2TkBdHXXrtOufSRIg54=',true);
         if(!sodium_crypto_sign_verify_detached($signature,$raw,$public))throw new RuntimeException('Invalid publisher signature.');
-        $manifest=json_decode($raw,true,64,JSON_THROW_ON_ERROR);if($manifest['version']!==$package['version']||$manifest['release_channel']!=='beta')throw new RuntimeException('Manifest/catalog mismatch.');
+        $manifest=json_decode($raw,true,64,JSON_THROW_ON_ERROR);if($manifest['version']!==$package['version']||$manifest['release_channel']!==($package['release_channel']??'stable'))throw new RuntimeException('Manifest/catalog mismatch.');
         foreach($manifest['files']as$file=>$hash){$content=$zip->getFromName('payload/'.$file);if(!is_string($content)||!hash_equals($hash,hash('sha256',$content)))throw new RuntimeException('Payload integrity failure.');}
         $zip->close();
     }
