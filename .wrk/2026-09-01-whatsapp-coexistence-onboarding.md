@@ -61,3 +61,12 @@ Keep the existing WhatsApp Business mobile application active while connecting t
 - Business Verification and Tech Provider App Review remain `In review` in Meta.
 - The app secret and webhook verification token are intentionally not stored in Git, release packages, deployment history or work notes.
 - Do not run standard phone registration. After Meta approval, start Coexistence onboarding from the CMS, confirm `is_on_biz_app=true` and `platform_type=CLOUD_API`, then complete the controlled delivery test.
+
+## Meta Connect form hotfix - 2026-09-02
+
+- Root cause: the global console form handler ignored the clicked button's `formaction`, so `Connect with Meta` posted the WhatsApp settings form to `/system/notifications` and displayed the unrelated `Notification channel saved and verified` toast.
+- Fix: the Meta connection button is explicitly marked as a native navigation action, and the shared UI handler now leaves that action to the browser. The native POST reaches `/system/notifications/whatsapp/connect`, whose controller creates the signed onboarding state and redirects to the central Meta Embedded Signup broker.
+- The UI asset version was advanced to prevent a cached copy of the old handler from preserving the defect.
+- Deployed atomically to both production CMS installations. Recovery point: `/root/eduvixo-backups/meta-connect-pre-20260901-225104`.
+- PHP and JavaScript syntax checks passed on both installations; Apache configuration is valid. Local and deployed SHA-256 values match, the corrected JavaScript is served publicly, `demo.eduvixo.com/login` returns HTTP 200 and `shoudu.lrn.asia/login` redirects to HTTPS as expected.
+- The OAuth button was not clicked during automated verification because completing the Meta authorization creates persistent external access. The next controlled action is to click `Connect with Meta` as an owner and complete the Meta Coexistence window after explicit confirmation.
