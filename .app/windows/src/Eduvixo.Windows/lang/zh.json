@@ -27,7 +27,7 @@
   "installRuntime": "获取 WebView2",
   "loginEyebrow": "安全演示访问",
   "loginBrandTitle": "一个安全的教育工作空间。",
-  "loginBrandDescription": "直接在 Windows 版 Eduvixo 中登录，不会显示网页登录界面。",
+  "loginBrandDescription": "直接在 Desktop Client for Windows 中登录，不会显示网页登录界面。",
   "secureConnection": "安全连接到 demo.eduvixo.com",
   "loginTitle": "登录 Eduvixo",
   "loginSubtitle": "演示访问已准备就绪。请输入安全验证码以继续。",

@@ -1,6 +1,6 @@
 param(
     [ValidatePattern('^\d+\.\d+\.\d+([.-][0-9A-Za-z.-]+)?$')]
-    [string]$Version = '0.2.3',
+    [string]$Version = '0.2.5',
     [ValidatePattern('^https://[a-z0-9.-]+/$')]
     [string]$Endpoint = 'https://cus.codesigning.azure.net/',
     [ValidatePattern('^[A-Za-z0-9-]{3,100}$')]
@@ -122,4 +122,4 @@ try {
     }
 }
 
-Write-Output "Eduvixo $Version signed and verified with publisher '$ExpectedPublisher'."
+Write-Output "Desktop Client for Windows $Version signed and verified with publisher '$ExpectedPublisher'."

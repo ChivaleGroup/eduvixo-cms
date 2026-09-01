@@ -27,7 +27,7 @@
   "installRuntime": "ดาวน์โหลด WebView2",
   "loginEyebrow": "การเข้าถึงเดโมที่ปลอดภัย",
   "loginBrandTitle": "พื้นที่ที่ปลอดภัยสำหรับสภาพแวดล้อมการศึกษาของคุณ",
-  "loginBrandDescription": "ลงชื่อเข้าใช้โดยตรงใน Eduvixo สำหรับ Windows โดยไม่แสดงหน้าล็อกอินบนเว็บ",
+  "loginBrandDescription": "ลงชื่อเข้าใช้โดยตรงใน Desktop Client for Windows โดยไม่แสดงหน้าล็อกอินบนเว็บ",
   "secureConnection": "การเชื่อมต่อที่ปลอดภัยไปยัง demo.eduvixo.com",
   "loginTitle": "ลงชื่อเข้าใช้ Eduvixo",
   "loginSubtitle": "การเข้าถึงเดโมพร้อมแล้ว โปรดป้อนรหัสความปลอดภัยเพื่อดำเนินการต่อ",

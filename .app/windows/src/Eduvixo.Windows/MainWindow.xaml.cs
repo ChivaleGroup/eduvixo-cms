@@ -59,7 +59,7 @@ public partial class MainWindow : Window
 
     private void ApplyLocalization()
     {
-        Title = $"Eduvixo - {LocalizationService.Get("appTitle")}";
+        Title = $"Desktop Client for Windows - {LocalizationService.Get("appTitle")}";
         LanguageLabel.Text = LocalizationService.Get("language");
         ChooseModeTitle.Text = LocalizationService.Get("chooseModeTitle");
         ChooseModeSubtitle.Text = LocalizationService.Get("chooseModeSubtitle");

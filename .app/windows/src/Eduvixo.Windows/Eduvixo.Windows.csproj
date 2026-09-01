@@ -6,12 +6,12 @@
     <AssemblyName>eduvixo</AssemblyName>
     <RootNamespace>Eduvixo.Windows</RootNamespace>
     <ApplicationIcon>app.ico</ApplicationIcon>
-    <Version>0.2.3</Version>
-    <Authors>Eduvixo &amp; QUANT Software House</Authors>
-    <Company>Eduvixo</Company>
-    <Product>Eduvixo</Product>
-    <Description>Eduvixo online workspace for Windows.</Description>
-    <Copyright>Copyright by Eduvixo &amp; QUANT Software House.</Copyright>
+    <Version>0.2.5</Version>
+    <Authors>QUANT Software House</Authors>
+    <Company>QUANT Software House</Company>
+    <Product>Desktop Client for Windows</Product>
+    <Description>Secure online CMS workspace for Windows.</Description>
+    <Copyright>Copyright by QUANT Software House.</Copyright>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>

@@ -1,6 +1,6 @@
 param(
     [ValidatePattern('^\d+\.\d+\.\d+([.-][0-9A-Za-z.-]+)?$')]
-    [string]$Version = '0.2.3',
+    [string]$Version = '0.2.5',
     [ValidateSet('Release', 'Debug')]
     [string]$Configuration = 'Release'
 )
@@ -43,4 +43,4 @@ try {
 } finally {
     Pop-Location
 }
-Write-Output "Eduvixo $Version published to $distRoot"
+Write-Output "Desktop Client for Windows $Version published to $distRoot"

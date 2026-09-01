@@ -8,15 +8,15 @@ $coreItems = array_map(static fn(array $item): array => ['name' => (string) ($it
 $freeItems = $ecosystemVariant === 'preview' ? [
     ['name'=>'AI Translation Assistant','detail'=>$t('marketplace.ai_translation_copy')],
     ['name'=>'Google Analytics','detail'=>$t('marketplace.google_analytics_copy')],
-    ['name'=>'Eduvixo for Windows','detail'=>$t('marketplace.windows_copy')],
+    ['name'=>'Desktop Client for Windows','detail'=>$t('marketplace.windows_copy')],
 ] : [
-    ['name'=>'Eduvixo Theme','detail'=>$t('marketplace.eduvixo_copy')],['name'=>'Shoudu Theme','detail'=>$t('marketplace.shoudu_copy')],['name'=>'Eduvixo for Windows','detail'=>$t('marketplace.windows_copy')],['name'=>'Google Analytics','detail'=>$t('marketplace.google_analytics_copy')],['name'=>'AI Translation Assistant','detail'=>$t('marketplace.ai_translation_copy')],
+    ['name'=>'Eduvixo','detail'=>$t('marketplace.eduvixo_copy')],['name'=>'Shoudu Custom Theme','detail'=>$t('marketplace.shoudu_copy')],['name'=>'Desktop Client for Windows','detail'=>$t('marketplace.windows_copy')],['name'=>'Google Analytics','detail'=>$t('marketplace.google_analytics_copy')],['name'=>'AI Translation Assistant','detail'=>$t('marketplace.ai_translation_copy')],
 ];
 $tiers = [
-    ['key'=>'core','icon'=>'layers','eyebrow'=>$t('ecosystem.core_eyebrow'),'title'=>'Eduvixo CMS','price'=>$t('marketplace.cms_price'),'copy'=>$t('ecosystem.core_copy'),'items'=>$coreItems],
+    ['key'=>'core','icon'=>'layers','eyebrow'=>$t('ecosystem.core_eyebrow'),'title'=>'Base CMS','price'=>$t('marketplace.cms_price'),'copy'=>$t('ecosystem.core_copy'),'items'=>$coreItems],
     ['key'=>'free','icon'=>'shield-check','eyebrow'=>$t('ecosystem.free_eyebrow'),'title'=>$t('ecosystem.free_title'),'price'=>$t('marketplace.free'),'copy'=>$t('ecosystem.free_copy'),'items'=>$freeItems],
     ['key'=>'premium','icon'=>'sparkles','eyebrow'=>$t('ecosystem.premium_eyebrow'),'title'=>$t('ecosystem.premium_title'),'price'=>$t('ecosystem.premium_price'),'copy'=>$t('ecosystem.premium_copy'),'items'=>[
-        ['name'=>'Eduvixo Calendar - '.$t('marketplace.calendar_price'),'detail'=>$t('marketplace.calendar_copy')],['name'=>'Google Calendar - '.$t('marketplace.integration_price'),'detail'=>$t('marketplace.google_calendar_copy')],['name'=>'Apple Calendar - '.$t('marketplace.integration_price'),'detail'=>$t('marketplace.apple_calendar_copy')],['name'=>'Microsoft 365 Calendar - '.$t('marketplace.integration_price'),'detail'=>$t('marketplace.microsoft_calendar_copy')],['name'=>'Telegram Notifications - '.$t('marketplace.notification_price'),'detail'=>$t('marketplace.telegram_copy')],['name'=>'WhatsApp Notifications - '.$t('marketplace.notification_price'),'detail'=>$t('marketplace.whatsapp_copy')],['name'=>'iFirewall - '.$t('marketplace.ifirewall_price'),'detail'=>$t('marketplace.ifirewall_copy')],
+        ['name'=>'My Calendar - '.$t('marketplace.calendar_price'),'detail'=>$t('marketplace.calendar_copy')],['name'=>'Google Calendar - '.$t('marketplace.integration_price'),'detail'=>$t('marketplace.google_calendar_copy')],['name'=>'Apple Calendar - '.$t('marketplace.integration_price'),'detail'=>$t('marketplace.apple_calendar_copy')],['name'=>'Microsoft 365 Calendar - '.$t('marketplace.integration_price'),'detail'=>$t('marketplace.microsoft_calendar_copy')],['name'=>'Telegram Notifications - '.$t('marketplace.notification_price'),'detail'=>$t('marketplace.telegram_copy')],['name'=>'WhatsApp Notifications - '.$t('marketplace.notification_price'),'detail'=>$t('marketplace.whatsapp_copy')],['name'=>'iFirewall - '.$t('marketplace.ifirewall_price'),'detail'=>$t('marketplace.ifirewall_copy')],
     ]],
 ];
 ?>

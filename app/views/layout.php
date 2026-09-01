@@ -7,7 +7,7 @@
     <title><?= $e($meta['title'] ?? 'Eduvixo') ?></title>
     <meta name="description" content="<?= $e($meta['description'] ?? '') ?>">
     <?php if ($keywords !== ''): ?><meta name="keywords" content="<?= $e($keywords) ?>"><?php endif; ?>
-    <meta name="author" content="Eduvixo · Chivale Group">
+    <meta name="author" content="Eduvixo · QUANT Software House">
     <meta name="application-name" content="Eduvixo">
     <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
     <meta name="googlebot" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">

@@ -15,7 +15,7 @@ public partial class App : Application
         _instanceMutex = new Mutex(true, "Local\\Eduvixo.Windows", out _ownsInstanceMutex);
         if (!_ownsInstanceMutex)
         {
-            MessageBox.Show("Eduvixo is already running.", "Eduvixo", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show("Desktop Client for Windows is already running.", "Desktop Client for Windows", MessageBoxButton.OK, MessageBoxImage.Information);
             Shutdown();
             return;
         }
@@ -49,7 +49,7 @@ public partial class App : Application
         {
         }
 
-        MessageBox.Show("Eduvixo encountered an unexpected error. Restart the application and try again.", "Eduvixo", MessageBoxButton.OK, MessageBoxImage.Error);
+        MessageBox.Show("Desktop Client for Windows encountered an unexpected error. Restart the application and try again.", "Desktop Client for Windows", MessageBoxButton.OK, MessageBoxImage.Error);
         e.Handled = true;
     }
 }

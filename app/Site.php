@@ -426,7 +426,7 @@ final class Site
     {
         $base = (string) $this->config['base_url'];
         $graph = [
-            ['@type' => 'Organization', '@id' => $base . '/#organization', 'name' => 'Eduvixo', 'legalName' => 'Chivale Group', 'url' => $base . '/', 'logo' => ['@type' => 'ImageObject', 'url' => $base . '/assets/eduvixo-logo.svg'], 'image' => $base . '/assets/images/og-default.jpg', 'email' => 'info@eduvixo.com', 'description' => (string) $this->t('footer.summary')],
+            ['@type' => 'Organization', '@id' => $base . '/#organization', 'name' => 'Eduvixo', 'legalName' => 'Chivale Group LTD', 'url' => $base . '/', 'logo' => ['@type' => 'ImageObject', 'url' => $base . '/assets/eduvixo-logo.svg'], 'image' => $base . '/assets/images/og-default.jpg', 'email' => 'info@eduvixo.com', 'description' => (string) $this->t('footer.summary')],
             ['@type' => 'WebSite', '@id' => $base . '/#website', 'url' => $base . '/', 'name' => 'Eduvixo', 'description' => (string) $this->t('footer.summary'), 'publisher' => ['@id' => $base . '/#organization'], 'inLanguage' => array_keys($this->config['languages'])],
             ['@type' => match ($page) { 'contact' => 'ContactPage', 'marketplace', 'support', 'knowledge-base' => 'CollectionPage', default => 'WebPage' }, '@id' => $canonicalUrl . '#webpage', 'url' => $canonicalUrl, 'name' => (string) ($meta['title'] ?? 'Eduvixo'), 'description' => (string) ($meta['description'] ?? ''), 'inLanguage' => $this->locale, 'isPartOf' => ['@id' => $base . '/#website'], 'about' => ['@id' => $base . '/#software']],
         ];

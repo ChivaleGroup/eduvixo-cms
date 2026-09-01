@@ -1,0 +1,10 @@
+<?php
+declare(strict_types=1);
+if(PHP_SAPI!=='cli')exit;
+$source='/root/eduvixo-deploy';$root='/var/www/clients/client9/web123/web';$owner='web123';$group='client9';
+$files=['config/marketplace.php','storage/marketplace/official-catalog.json','storage/marketplace/packages/eduvixo-windows-0.2.5-x64.exe','storage/marketplace/packages/eduvixo-windows-0.2.5-x86.exe'];
+$copy=static function(string$source,string$target)use($owner,$group):void{if(!is_file($source))throw new RuntimeException('Missing source: '.$source);if(!is_dir(dirname($target))&&!mkdir(dirname($target),0750,true)&&!is_dir(dirname($target)))throw new RuntimeException('Cannot create target directory.');$temp=$target.'.windows-'.bin2hex(random_bytes(5));if(!copy($source,$temp)||!chmod($temp,0640)||!chown($temp,$owner)||!chgrp($temp,$group)||!rename($temp,$target))throw new RuntimeException('Atomic publish failed: '.$target);};
+$map=['config/marketplace.php'=>'marketplace.php','storage/marketplace/official-catalog.json'=>'official-catalog.json','storage/marketplace/packages/eduvixo-windows-0.2.5-x64.exe'=>'eduvixo-windows-0.2.5-x64.exe','storage/marketplace/packages/eduvixo-windows-0.2.5-x86.exe'=>'eduvixo-windows-0.2.5-x86.exe'];
+foreach($files as$file)$copy($source.'/'.$map[$file],$root.'/'.$file);
+$market=(static fn(string$path):array=>require$path)($root.'/config/marketplace.php');$windows=array_values(array_filter($market['packages'],static fn(array$item):bool=>($item['slug']??'')==='eduvixo-windows'))[0]??null;if(!$windows||$windows['name']!=='Desktop Client for Windows'||$windows['version']!=='0.2.5')throw new RuntimeException('Windows listing identity mismatch.');foreach($windows['variants']as$variant){if(!is_file($variant['file'])||filesize($variant['file'])!==(int)$variant['size']||!hash_equals($variant['checksum'],hash_file('sha256',$variant['file'])))throw new RuntimeException('Windows artifact verification failed.');}
+echo json_encode(['ok'=>true,'name'=>$windows['name'],'version'=>$windows['version']],JSON_UNESCAPED_SLASHES|JSON_THROW_ON_ERROR).PHP_EOL;
