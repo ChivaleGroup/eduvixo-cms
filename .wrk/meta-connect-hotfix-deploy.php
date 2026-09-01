@@ -11,6 +11,7 @@ $sites = [
 $files = [
     'app/Views/console-notification-settings.php',
     'app/Views/console.php',
+    'config/app.php',
     'public/theme/eduvixo-ui.js',
 ];
 $run = static function (array $command): void {
@@ -32,6 +33,7 @@ foreach ($files as $file) if (!is_file($stage . '/' . $file)) throw new RuntimeE
 if (!str_contains((string) file_get_contents($stage . '/app/Views/console-notification-settings.php'), 'data-eduvixo-native')) throw new RuntimeException('Native Meta action marker is missing.');
 if (!str_contains((string) file_get_contents($stage . '/public/theme/eduvixo-ui.js'), "event.submitter?.hasAttribute('data-eduvixo-native')")) throw new RuntimeException('Native form bypass is missing.');
 if (!str_contains((string) file_get_contents($stage . '/app/Views/console.php'), 'eduvixo-ui.js?v=20260902-meta-connect-1')) throw new RuntimeException('Cache version was not updated.');
+if (!str_contains((string) file_get_contents($stage . '/config/app.php'), "'whatsapp_onboarding_url'")) throw new RuntimeException('WhatsApp onboarding configuration is missing.');
 
 $backup = '/root/eduvixo-backups/meta-connect-pre-' . gmdate('Ymd-His');
 if (!mkdir($backup, 0700, true)) throw new RuntimeException('Cannot create backup directory.');
@@ -43,7 +45,11 @@ foreach ($sites as $site) {
     foreach ($files as $file) $publish($stage . '/' . $file, $site['root'] . '/' . $file, $site['owner'], $site['group']);
     $run(['php', '-l', $site['root'] . '/app/Views/console-notification-settings.php']);
     $run(['php', '-l', $site['root'] . '/app/Views/console.php']);
+    $run(['php', '-l', $site['root'] . '/config/app.php']);
     $run(['node', '--check', $site['root'] . '/public/theme/eduvixo-ui.js']);
+    foreach(array_keys(getenv()) as $key) if(str_starts_with($key,'CMS_')) putenv($key);
+    $config=(static fn(string $file):array=>require $file)($site['root'].'/config/app.php');
+    if (($config['integrations']['whatsapp_onboarding_url']??'') !== 'https://www.eduvixo.com/api/integrations/whatsapp/onboarding') throw new RuntimeException('WhatsApp onboarding URL verification failed.');
 }
 $run(['apache2ctl', 'configtest']);
 echo json_encode(['ok' => true, 'backup' => $backup], JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR) . PHP_EOL;

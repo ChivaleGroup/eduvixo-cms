@@ -70,3 +70,10 @@ Keep the existing WhatsApp Business mobile application active while connecting t
 - Deployed atomically to both production CMS installations. Recovery point: `/root/eduvixo-backups/meta-connect-pre-20260901-225104`.
 - PHP and JavaScript syntax checks passed on both installations; Apache configuration is valid. Local and deployed SHA-256 values match, the corrected JavaScript is served publicly, `demo.eduvixo.com/login` returns HTTP 200 and `shoudu.lrn.asia/login` redirects to HTTPS as expected.
 - The OAuth button was not clicked during automated verification because completing the Meta authorization creates persistent external access. The next controlled action is to click `Connect with Meta` as an owner and complete the Meta Coexistence window after explicit confirmation.
+
+### Central-service configuration repair
+
+- The first corrected button attempt exposed a separate production drift: both installed `config/app.php` files predated the `integrations.whatsapp_onboarding_url` setting. The CMS therefore rejected an empty broker URL with `The central WhatsApp connection service is not configured securely` before making any network request.
+- Synchronized the complete current non-secret application configuration from private source to both production CMS installations. This also restores the current Marketplace and Web Push configuration blocks that were absent from the older deployed configuration files; installation-specific secrets and values remain in each untouched `.env` file.
+- Atomic redeployment recovery point: `/root/eduvixo-backups/meta-connect-pre-20260901-230603`.
+- Both CMS installations now resolve the exact HTTPS broker URL and successfully construct the hardened onboarding client. The central broker reports ready, its encryption key remains owned correctly with mode `0640`, and an unauthenticated onboarding request returns the expected HTTP 401 rather than a configuration error.
