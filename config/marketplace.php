@@ -19,8 +19,8 @@ return [
     'license_product_version' => '1.0',
     'packages' => [
         'b843df54f8988bad5b884f54dceb7250' => [
-            'type' => 'system', 'slug' => 'eduvixo-cms', 'name' => 'Eduvixo CMS', 'version' => '1.0.9', 'release_channel' => 'stable', 'size' => 10404304,
-            'file' => $packageRoot . '/eduvixo-install-1.0.9.zip', 'checksum' => '89ebf77e77f169afb26bd09af18faf94d549be5868765539a5a9b42db988eec1',
+            'type' => 'system', 'slug' => 'eduvixo-cms', 'name' => 'Eduvixo CMS', 'version' => '1.0.10', 'release_channel' => 'stable', 'size' => 10407147,
+            'file' => $packageRoot . '/eduvixo-install-1.0.10.zip', 'checksum' => '63f37e42bdd0159c3f0df98921d401a20bf7b42f90f75cf3c34581f74d9d8570',
             'browser_enabled' => false, 'license_download_enabled' => true, 'update_enabled' => false, 'icon' => 'layers', 'copy_key' => 'marketplace.system_copy',
             'meta_keys' => ['marketplace.cms_price'],
         ],
@@ -73,10 +73,10 @@ return [
             'meta_keys' => ['marketplace.notification_price', 'marketplace.system_notifications'], 'license_product_name' => 'Telegram Notifications for Eduvixo', 'license_product_model' => 'Calendar Notification Integration', 'license_product_version' => '1.0.0',
         ],
         '854d28de19fe0025dc1f786786720529' => [
-            'type' => 'plugin', 'slug' => 'whatsapp-notifications', 'name' => 'WhatsApp Notifications', 'version' => '1.0.2-beta.1', 'release_channel' => 'beta', 'size' => 3522,
-            'file' => $packageRoot . '/whatsapp-notifications-1.0.2-beta.1.zip', 'checksum' => '13cecb339ab09c965db7b3eb784c11b03c9f6d50e9b72e089c33920515aba9ad',
+            'type' => 'plugin', 'slug' => 'whatsapp-notifications', 'name' => 'WhatsApp Notifications', 'version' => '1.1.0-beta.1', 'release_channel' => 'beta', 'size' => 3522,
+            'file' => $packageRoot . '/whatsapp-notifications-1.1.0-beta.1.zip', 'checksum' => '554190f6df5dd61a181b9984ac4fd5ac53e36e0b6b6bdc22bde3de34e6e4d210',
             'browser_enabled' => false, 'license_download_enabled' => true, 'update_enabled' => true, 'system_installable' => true, 'icon' => 'message-circle', 'copy_key' => 'marketplace.whatsapp_copy',
-            'meta_keys' => ['marketplace.notification_price', 'marketplace.system_notifications'], 'license_product_name' => 'WhatsApp Notifications for Eduvixo', 'license_product_model' => 'Calendar Notification Integration', 'license_product_version' => '1.0.0',
+            'meta_keys' => ['marketplace.notification_price', 'marketplace.system_notifications'], 'license_product_name' => 'WhatsApp Notifications for Eduvixo', 'license_product_model' => 'System and Calendar Notification Integration', 'license_product_version' => '1.1.0-beta.1',
         ],
         'c42137f830b6a10e8896a57eddfe6aee' => [
             'type' => 'plugin', 'slug' => 'google-analytics', 'name' => 'Google Analytics', 'version' => '1.0.0', 'size' => 8845,

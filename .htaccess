@@ -1,9 +1,7 @@
 Options -Indexes -MultiViews
-LimitRequestBody 65536
+LimitRequestBody 1048576
 RewriteEngine On
 
-RewriteCond %{HTTP:Content-Length} ^(?:[1-9][0-9]{5,}|[7-9][0-9]{4}|6[6-9][0-9]{3}|65[6-9][0-9]{2}|655[4-9][0-9]|6553[7-9])$
-RewriteRule ^ - [R=413,L]
 RewriteRule ^(?:\.env(?:\..*)?|\.cfg|\.cms|\.doc|\.git|\.src|\.wrk|app|config|lang|resources|scripts|storage|tmp)(?:/|$) - [R=404,L,NC]
 RewriteRule ^(?:README\.md|\.gitignore|\.info)$ - [R=404,L,NC]
 RewriteRule \.(?:zip|sha|tar|tgz|gz|7z|rar|exe|msi|appx|msix)$ - [R=404,L,NC]

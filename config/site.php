@@ -29,6 +29,18 @@ if ($rateKey === '') {
     $rateKey = is_file($secretPath) ? trim((string) file_get_contents($secretPath)) : '';
 }
 if (!preg_match('/^[A-Fa-f0-9]{64}$/D', $rateKey)) throw new RuntimeException('SITE_RATE_KEY must contain 64 hexadecimal characters.');
+$whatsappKey = trim($env('SITE_WHATSAPP_BROKER_KEY'));
+if ($whatsappKey === '') {
+    $secretPath = $root . '/storage/.whatsapp-broker-key';
+    if (!is_file($secretPath)) {
+        $directory = dirname($secretPath);
+        if (!is_dir($directory) && !mkdir($directory, 0750, true) && !is_dir($directory)) throw new RuntimeException('Secure WhatsApp onboarding storage is unavailable.');
+        $candidate = bin2hex(random_bytes(32)); $handle = @fopen($secretPath, 'x');
+        if (is_resource($handle)) { try { if (fwrite($handle, $candidate) !== strlen($candidate) || !fflush($handle)) throw new RuntimeException('WhatsApp onboarding key could not be persisted.'); } finally { fclose($handle); } @chmod($secretPath, 0640); }
+    }
+    $whatsappKey = is_file($secretPath) ? trim((string) file_get_contents($secretPath)) : '';
+}
+if (!preg_match('/^[A-Fa-f0-9]{64}$/D', $whatsappKey)) throw new RuntimeException('SITE_WHATSAPP_BROKER_KEY must contain 64 hexadecimal characters.');
 
 return [
     'root' => $root,
@@ -38,6 +50,14 @@ return [
     'google_site_verification' => $env('SITE_GOOGLE_VERIFICATION'),
     'google_analytics_id' => $env('SITE_GOOGLE_ANALYTICS_ID', 'G-CCZKQZHM4S'),
     'rate_key' => strtolower($rateKey),
+    'meta_whatsapp' => [
+        'app_id' => $env('SITE_META_WHATSAPP_APP_ID'),
+        'app_secret' => $env('SITE_META_WHATSAPP_APP_SECRET'),
+        'config_id' => $env('SITE_META_WHATSAPP_CONFIG_ID'),
+        'webhook_token' => $env('SITE_META_WHATSAPP_WEBHOOK_TOKEN'),
+        'storage' => $root . '/storage/whatsapp-onboarding',
+        'key' => strtolower($whatsappKey),
+    ],
     'marketplace' => require __DIR__ . '/marketplace.php',
     'languages' => [
         'zh' => ['english' => 'Chinese', 'native' => '中文', 'country' => ['CN', 'HK', 'MO', 'TW']],

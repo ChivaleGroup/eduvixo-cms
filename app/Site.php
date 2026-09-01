@@ -69,6 +69,13 @@ final class Site
 
     public function dispatch(): never
     {
+        $path = rtrim((string) parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH), '/') ?: '/';
+        $length = (int) ($_SERVER['CONTENT_LENGTH'] ?? 0); if ($length > ($path === '/api/integrations/whatsapp/webhook' ? 1048576 : 65536)) $this->plain('Request entity too large.', 413);
+        if ($path === '/system/notifications/whatsapp') $this->whatsappLauncher();
+        if ($path === '/api/integrations/whatsapp/onboarding/start') $this->whatsappStart();
+        if ($path === '/api/integrations/whatsapp/onboarding/complete') $this->whatsappComplete();
+        if ($path === '/api/integrations/whatsapp/onboarding/claim') $this->whatsappClaim();
+        if ($path === '/api/integrations/whatsapp/webhook') $this->whatsappWebhook();
         $segments = array_values(array_filter(explode('/', trim($this->requestPath(), '/')), static fn(string $segment): bool => $segment !== ''));
         if ($segments && isset($this->config['languages'][strtolower($segments[0])])) array_shift($segments);
         $slug = implode('/', $segments); $page = array_search($slug, self::PAGE_ROUTES, true);
@@ -76,6 +83,61 @@ final class Site
         $method = strtoupper((string) ($_SERVER['REQUEST_METHOD'] ?? 'GET'));
         if (!in_array($method, ['GET', 'HEAD'], true) && !($page === 'contact' && $method === 'POST')) $this->methodNotAllowed($page === 'contact' ? ['GET', 'HEAD', 'POST'] : ['GET', 'HEAD']);
         match ($page) { 'contact' => $this->contact(), 'marketplace' => $this->marketplace(), default => $this->render($page) };
+    }
+
+    public function whatsappStart(): never
+    {
+        if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') $this->methodNotAllowed(['POST']);
+        try { $this->json($this->whatsappBroker()->start($_SERVER)); }
+        catch (\RuntimeException $error) { $this->jsonError($error->getMessage(), $this->errorStatus($error)); }
+    }
+
+    public function whatsappLauncher(): never
+    {
+        if (!in_array(($_SERVER['REQUEST_METHOD'] ?? 'GET'), ['GET', 'HEAD'], true)) $this->methodNotAllowed(['GET', 'HEAD']);
+        $this->startSession(); $broker = $this->whatsappBroker();
+        try {
+            if (isset($_GET['state'])) {
+                $session = $broker->begin((string) $_GET['state']);
+                session_regenerate_id(true); $_SESSION['whatsapp_onboarding'] = $session; $_SESSION['whatsapp_csrf'] = bin2hex(random_bytes(24));
+                $this->noStore(); header('Location: /system/notifications/whatsapp', true, 303); exit;
+            }
+            $session = is_array($_SESSION['whatsapp_onboarding'] ?? null) ? $_SESSION['whatsapp_onboarding'] : [];
+            if ((int) ($session['expires'] ?? 0) < time()) throw new \RuntimeException('This WhatsApp connection session has expired. Start it again from Eduvixo.', 410);
+            $app = $broker->app(); $csrf = (string) ($_SESSION['whatsapp_csrf'] ?? ''); $nonce = $this->nonce; $config = $this->config;
+            $this->whatsappHeaders(); require $this->config['root'] . '/app/views/whatsapp-onboarding.php'; exit;
+        } catch (\RuntimeException $error) { unset($_SESSION['whatsapp_onboarding'], $_SESSION['whatsapp_csrf']); $this->plain($error->getMessage(), $this->errorStatus($error)); }
+    }
+
+    public function whatsappComplete(): never
+    {
+        if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') $this->methodNotAllowed(['POST']);
+        $this->startSession();
+        try {
+            $input = $this->jsonInput();
+            if (!hash_equals((string) ($_SESSION['whatsapp_csrf'] ?? ''), (string) ($input['csrf'] ?? ''))) throw new \RuntimeException('The onboarding session is invalid. Start it again from Eduvixo.', 403);
+            $session = is_array($_SESSION['whatsapp_onboarding'] ?? null) ? $_SESSION['whatsapp_onboarding'] : [];
+            $result = $this->whatsappBroker()->complete($session, $input);
+            unset($_SESSION['whatsapp_onboarding'], $_SESSION['whatsapp_csrf']); $this->json($result);
+        } catch (\RuntimeException $error) { $this->jsonError($error->getMessage(), $this->errorStatus($error)); }
+    }
+
+    public function whatsappClaim(): never
+    {
+        if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') $this->methodNotAllowed(['POST']);
+        try { $input = $this->jsonInput(); $this->json($this->whatsappBroker()->claim($_SERVER, (string) ($input['claim'] ?? ''))); }
+        catch (\RuntimeException $error) { $this->jsonError($error->getMessage(), $this->errorStatus($error)); }
+    }
+
+    public function whatsappWebhook(): never
+    {
+        $method = (string) ($_SERVER['REQUEST_METHOD'] ?? 'GET'); $broker = $this->whatsappBroker();
+        try {
+            if ($method === 'GET') { header('Content-Type: text/plain; charset=utf-8'); header('Cache-Control: no-store'); echo $broker->verifyWebhook((string) ($_GET['hub_mode'] ?? $_GET['hub.mode'] ?? ''), (string) ($_GET['hub_verify_token'] ?? $_GET['hub.verify_token'] ?? ''), (string) ($_GET['hub_challenge'] ?? $_GET['hub.challenge'] ?? '')); exit; }
+            if ($method !== 'POST') $this->methodNotAllowed(['GET', 'POST']);
+            $broker->acceptWebhook((string) file_get_contents('php://input'), (string) ($_SERVER['HTTP_X_HUB_SIGNATURE_256'] ?? ''));
+            http_response_code(200); header('Content-Type: text/plain; charset=utf-8'); header('Cache-Control: no-store'); echo 'EVENT_RECEIVED'; exit;
+        } catch (\RuntimeException $error) { $this->plain($error->getMessage(), $this->errorStatus($error)); }
     }
 
     public function contact(): never
@@ -301,6 +363,13 @@ final class Site
         header("Content-Security-Policy: default-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; img-src 'self' data: https://www.google-analytics.com; media-src 'self'; font-src 'self'; style-src 'self'; script-src 'self' 'nonce-{$this->nonce}' https://www.googletagmanager.com; connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://region1.analytics.google.com; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests");
     }
 
+    private function whatsappHeaders(): void
+    {
+        header('Content-Type: text/html; charset=utf-8'); header('Cache-Control: private, no-store, no-cache, must-revalidate, max-age=0'); header('X-Robots-Tag: noindex, nofollow, noarchive');
+        header('Referrer-Policy: no-referrer'); header('X-Content-Type-Options: nosniff'); header('X-Frame-Options: DENY'); header('Permissions-Policy: camera=(), microphone=(), geolocation=()'); header('Strict-Transport-Security: max-age=31536000'); header('Cross-Origin-Opener-Policy: same-origin-allow-popups'); header('X-Permitted-Cross-Domain-Policies: none'); header_remove('X-Powered-By');
+        header("Content-Security-Policy: default-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; img-src 'self' data: https://*.facebook.com; font-src 'self'; style-src 'self'; script-src 'self' https://connect.facebook.net; connect-src 'self' https://www.facebook.com https://graph.facebook.com; frame-src https://www.facebook.com; upgrade-insecure-requests");
+    }
+
     private function requestPath(): string
     {
         $path = (string) parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
@@ -387,6 +456,25 @@ final class Site
         require_once __DIR__ . '/MarketplaceService.php';
         return new MarketplaceService((array) $this->config['marketplace'], (string) $this->config['base_url'], (string) $this->config['rate_key']);
     }
+
+    private function whatsappBroker(): WhatsAppOnboardingService
+    {
+        require_once __DIR__ . '/WhatsAppOnboardingService.php'; $meta = (array) ($this->config['meta_whatsapp'] ?? []);
+        return new WhatsAppOnboardingService($meta, ['endpoint' => (string) ($this->config['marketplace']['license_endpoint'] ?? '')], (string) $this->config['base_url'], (string) ($meta['key'] ?? ''));
+    }
+
+    private function jsonInput(): array
+    {
+        if (!str_contains(strtolower((string) ($_SERVER['CONTENT_TYPE'] ?? '')), 'application/json')) throw new \RuntimeException('JSON request required.', 415);
+        if ((int) ($_SERVER['CONTENT_LENGTH'] ?? 0) > 16384) throw new \RuntimeException('The request body is too large.', 413);
+        $body = (string) file_get_contents('php://input'); if (strlen($body) > 16384) throw new \RuntimeException('The request body is too large.', 413);
+        try { $input = json_decode($body, true, 16, JSON_THROW_ON_ERROR); }
+        catch (\JsonException) { throw new \RuntimeException('The request body is invalid.', 400); }
+        if (!is_array($input)) throw new \RuntimeException('The request body is invalid.', 400);
+        return $input;
+    }
+
+    private function errorStatus(\RuntimeException $error): int { return in_array($error->getCode(), [400, 401, 403, 404, 405, 410, 413, 415, 422, 429, 502, 503], true) ? $error->getCode() : 500; }
 
     private function json(array $data): never { header('Content-Type: application/json; charset=utf-8'); header('Cache-Control: no-store'); header('X-Robots-Tag: noindex, nofollow, noarchive'); echo json_encode($data, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES); exit; }
     private function jsonError(string $message, int $status, array $details = []): never { http_response_code($status); $this->json(['error' => true, 'message' => $message] + $details); }
