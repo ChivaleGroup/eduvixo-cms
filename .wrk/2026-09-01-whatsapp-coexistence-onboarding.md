@@ -77,3 +77,10 @@ Keep the existing WhatsApp Business mobile application active while connecting t
 - Synchronized the complete current non-secret application configuration from private source to both production CMS installations. This also restores the current Marketplace and Web Push configuration blocks that were absent from the older deployed configuration files; installation-specific secrets and values remain in each untouched `.env` file.
 - Atomic redeployment recovery point: `/root/eduvixo-backups/meta-connect-pre-20260901-230603`.
 - Both CMS installations now resolve the exact HTTPS broker URL and successfully construct the hardened onboarding client. The central broker reports ready, its encryption key remains owned correctly with mode `0640`, and an unauthenticated onboarding request returns the expected HTTP 401 rather than a configuration error.
+
+### Meta JavaScript SDK activation
+
+- A controlled onboarding attempt reached Meta but was rejected because `Facebook Login for Business -> Settings -> Login with the JavaScript SDK` was disabled.
+- Enabled the JavaScript SDK setting in the published `Chivale Messages & Content` Meta application and added the approved SDK origin. Meta normalized the stored origin to `https://www.eduvixo.com/`.
+- Re-read the settings after saving: the SDK switch remains enabled, the allowed origin remains present, the exact OAuth redirect remains `https://www.eduvixo.com/system/notifications/whatsapp`, and HTTPS plus strict redirect mode remain enforced.
+- No CMS credentials, Meta secrets or access tokens were changed or exposed during this configuration step.
