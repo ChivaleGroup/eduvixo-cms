@@ -35,7 +35,8 @@ try{
     $assert($updater->version()===$release['version'],'full update installed through real updater');
     $assert(file_get_contents($fixture.'/themes/school.txt')==='preserve theme'&&file_get_contents($fixture.'/storage/uploads.txt')==='preserve uploaded data'&&file_get_contents($fixture.'/config/app.php')==='<?php return [];','theme configuration and uploads preserved');
     $assert($db->query('SELECT value FROM settings WHERE `key`="core_preservation_test"')->fetchColumn()==='"keep-this-school-data"','school database data preserved');
-    $assert((int)$db->query('SELECT COUNT(*) FROM migrations WHERE name IN("023_demo_user_read_only.sql","024_system_notifications.sql")')->fetchColumn()===2,'both additive migrations recorded');
+    $assert((int)$db->query('SELECT COUNT(*) FROM migrations WHERE name IN("023_demo_user_read_only.sql","024_system_notifications.sql","025_web_push.sql")')->fetchColumn()===3,'all additive migrations recorded');
+    $assert((bool)$db->query("SHOW TABLES LIKE 'web_push_subscriptions'")->fetchColumn(),'Web Push schema is available after update');
     $assert(!is_file($fixture.'/storage/system-updates/maintenance.json'),'maintenance cleared after success');
     $snapshot=$fixture.'/storage/system-updates/'.$recovery.'/database.sql.gz';$assert(is_file($snapshot)&&str_contains(gzdecode(file_get_contents($snapshot)),'keep-this-school-data'),'database recovery snapshot contains original data');
     $old=new ZipArchive();$old->open($fixture.'/storage/system-updates/'.$recovery.'/files.zip');$assert($old->getFromName('app/release.json')==='{"version":"1.0.0"}','previous core metadata backed up');$old->close();
