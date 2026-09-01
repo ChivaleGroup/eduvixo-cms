@@ -11,14 +11,17 @@ Keep the existing WhatsApp Business mobile application active while connecting t
 - Tech Provider App Review documentation is `In review`.
 - The existing WhatsApp Business number was added to the Chivale WABA but remains unverified. Standard number registration correctly refused it because the number is active in the WhatsApp Business application.
 - The number must not be disconnected or migrated through standard registration. Continue only through Meta-hosted Embedded Signup configured for WhatsApp Business App Coexistence.
-- Meta currently offers creation of a hosted Embedded Signup configuration and requires an OAuth redirect URI.
+- Meta-hosted Embedded Signup configuration `1004209916010848` is active for app `1017168461147353`, version 4, with the Coexistence onboarding feature and redirect URI `https://www.eduvixo.com/system/notifications/whatsapp`.
+- The application Website platform and app domain are persisted as `https://www.eduvixo.com/` and `www.eduvixo.com`.
+- The central webhook callback is verified at `https://www.eduvixo.com/api/integrations/whatsapp/webhook`.
+- Required webhook fields `messages`, `history`, `smb_app_state_sync` and `smb_message_echoes` are subscribed at Graph API `v26.0`.
 
 ## Safety and continuation
 
 - Do not store the phone number, verification codes, app secret, OAuth codes, access tokens, or system-user tokens in this repository or work notes.
 - Do not remove the number from the WhatsApp Business application.
 - Wait for both Meta reviews to complete before treating the integration as production-ready.
-- Next external action: create the persistent Meta-hosted Embedded Signup configuration with an HTTPS callback controlled by Eduvixo, then run the QR-based Coexistence onboarding from the WhatsApp Business mobile application.
+- Next external action after both Meta reviews are approved: run the QR-based Coexistence onboarding from an Eduvixo CMS and the WhatsApp Business mobile application.
 - After onboarding: create a least-privilege system-user token, configure the approved utility template, payment method, encrypted Eduvixo channel settings and consented recipient map, then run a controlled delivery test.
 
 ## Existing Eduvixo implementation
@@ -50,9 +53,11 @@ Keep the existing WhatsApp Business mobile application active while connecting t
 - Both production CMS installations report `1.0.10`; Apache configuration is valid and public website, Marketplace, demo and Shoudu return HTTP 200.
 - Public request limits remain 64 KiB generally, with an isolated 1 MiB allowance for signed Meta webhook payloads. A 70 KiB ordinary request returns 413, a 70 KiB unsigned webhook reaches signature validation and returns 403, and a webhook over 1 MiB returns 413.
 - The central broker key exists with mode `0640` and the website owner.
+- Meta app credentials and the webhook verification token are installed only in the production website `.env`, owned by `web123:client9` with effective mode `100600`; they are absent from Git and this work note.
+- Live webhook verification passed: a valid HMAC-SHA256 request returns 200, an invalid signature returns 403, and an unauthenticated onboarding-start request returns 401 (rather than the prior not-configured response).
 
 ## Remaining external activation
 
 - Business Verification and Tech Provider App Review remain `In review` in Meta.
-- The Meta-hosted Embedded Signup configuration, app secret and webhook verification token are intentionally not stored in Git.
-- Immediately before creating the persistent Meta configuration and submitting its redirect/webhook settings, obtain direct user confirmation under the browser safety policy.
+- The app secret and webhook verification token are intentionally not stored in Git, release packages, deployment history or work notes.
+- Do not run standard phone registration. After Meta approval, start Coexistence onboarding from the CMS, confirm `is_on_biz_app=true` and `platform_type=CLOUD_API`, then complete the controlled delivery test.
