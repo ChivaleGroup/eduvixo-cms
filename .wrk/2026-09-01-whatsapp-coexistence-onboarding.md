@@ -84,3 +84,11 @@ Keep the existing WhatsApp Business mobile application active while connecting t
 - Enabled the JavaScript SDK setting in the published `Chivale Messages & Content` Meta application and added the approved SDK origin. Meta normalized the stored origin to `https://www.eduvixo.com/`.
 - Re-read the settings after saving: the SDK switch remains enabled, the allowed origin remains present, the exact OAuth redirect remains `https://www.eduvixo.com/system/notifications/whatsapp`, and HTTPS plus strict redirect mode remain enforced.
 - No CMS credentials, Meta secrets or access tokens were changed or exposed during this configuration step.
+
+### Meta App Review production-access blocker
+
+- The next controlled Embedded Signup attempt reached the WhatsApp Business number step, proving that the CMS redirect, central broker, JavaScript SDK and Meta-hosted onboarding configuration are working.
+- Meta then rejected the number with error `#2655111` because the application has not yet received production-level access for WhatsApp Business management and messaging.
+- Live inspection of `Permissions and features` confirmed that `business_management`, `whatsapp_business_management` and `whatsapp_business_messaging` are present but remain `Ready for testing`, not Advanced Access.
+- All three permissions are already included in App Review submission `1017193991144800`; it is still `Not submitted` and its final submit action is disabled while the connected `Chivale` business portfolio remains `In review`.
+- This is an external Meta approval gate, not a CMS or phone-number defect. Repeating Embedded Signup cannot complete until business verification is approved and the prepared App Review submission is completed and approved. Do not remove or migrate the existing WhatsApp Business App number in the meantime.
