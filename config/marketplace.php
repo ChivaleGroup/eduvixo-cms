@@ -20,8 +20,8 @@ return [
     // Legacy license contract names are intentionally retained below as non-public compatibility identifiers.
     'packages' => [
         'b843df54f8988bad5b884f54dceb7250' => [
-            'type' => 'system', 'slug' => 'eduvixo-cms', 'name' => 'Base CMS', 'version' => '1.0.20', 'release_channel' => 'stable', 'size' => 10442729,
-            'file' => $packageRoot . '/eduvixo-install-1.0.20.zip', 'checksum' => 'd29b046ae8b83ed801f12413e80f767166bd66d28784c920b34e406ee18be830',
+            'type' => 'system', 'slug' => 'eduvixo-cms', 'name' => 'Base CMS', 'version' => '1.0.21', 'release_channel' => 'stable', 'size' => 10443587,
+            'file' => $packageRoot . '/eduvixo-install-1.0.21.zip', 'checksum' => 'ee75cf95cdb9fbafe5b1fb1d3fc63b5b1064055871e37a31b2417cec286d106d',
             'browser_enabled' => false, 'license_download_enabled' => true, 'update_enabled' => false, 'icon' => 'layers', 'copy_key' => 'marketplace.system_copy',
             'meta_keys' => ['marketplace.cms_price'],
         ],
