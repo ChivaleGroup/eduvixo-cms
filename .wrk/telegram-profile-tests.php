@@ -1,0 +1,21 @@
+<?php
+declare(strict_types=1);
+if (PHP_SAPI !== 'cli') exit(1);
+$root=dirname(__DIR__);$count=0;$ok=static function(bool$value,string$label)use(&$count):void{if(!$value)throw new RuntimeException('FAIL '.$label);echo'PASS '.$label.PHP_EOL;$count++;};
+$manifest=json_decode((string)file_get_contents($root.'/.plugins/EduvixoTelegram/source/plugin.json'),true,16,JSON_THROW_ON_ERROR);
+$provider=require$root.'/.plugins/EduvixoTelegram/source/src/provider.php';
+$channels=(string)file_get_contents($root.'/.cms/source/app/Core/NotificationChannels.php');
+$controller=(string)file_get_contents($root.'/.cms/source/app/Http/NotificationController.php');
+$routes=(string)file_get_contents($root.'/.cms/source/public/index.php');
+$view=(string)file_get_contents($root.'/.cms/source/app/Views/console-notification-settings.php');
+$js=(string)file_get_contents($root.'/.cms/source/public/theme/eduvixo-notifications.js');
+$css=(string)file_get_contents($root.'/.cms/source/public/theme/eduvixo-notifications.css');
+$ok(($manifest['slug']??'')==='telegram-notifications'&&($manifest['version']??'')==='1.1.0-beta.1','Telegram package identity');
+$ok(is_object($provider)&&method_exists($provider,'profilePhoto')&&method_exists($provider,'setProfilePhoto')&&method_exists($provider,'removeProfilePhoto'),'Telegram provider profile contract');
+$ok(str_contains($channels,'is_uploaded_file')&&str_contains($channels,'2_000_000')&&str_contains($channels,"['image/png', 'image/jpeg', 'image/webp']")&&str_contains($channels,'imagecopyresampled')&&str_contains($channels,'@unlink($temporary)'),'server-side image validation and cleanup');
+$ok(str_contains($controller,"assert('system.owner')")&&str_contains($controller,'isDemoUser()')&&str_contains($controller,'verifyCsrf')&&str_contains($controller,"'Cache-Control: private, no-store'")&&!str_contains($controller,'bot_token'),'owner, CSRF and token-disclosure boundaries');
+$ok(substr_count($routes,"/system/notifications/telegram/profile-photo")===3,'Telegram profile routes');
+$ok(str_contains($view,'data-telegram-profile-upload')&&str_contains($view,'data-telegram-current-photo')&&str_contains($view,'Only an active, writable Owner'),'owner and read-only interface states');
+$ok(str_contains($js,"event.stopImmediatePropagation()")&&str_contains($js,"data.set('photo',blob")&&str_contains($js,"'image/jpeg',.9"),'AJAX crop and single-submit boundary');
+$ok(str_contains($css,'@media(max-width:640px)')&&str_contains($css,'.eduvixo-telegram-profile-grid'),'responsive profile layout');
+echo'ASSERTIONS '.$count.PHP_EOL;
