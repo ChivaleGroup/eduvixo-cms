@@ -1,0 +1,8 @@
+<?php
+declare(strict_types=1);
+if(PHP_SAPI!=='cli')exit;
+$root=rtrim((string)($argv[1]??''),'/');if(!is_file($root.'/config/app.php')||!is_file($root.'/addons/calendar/addon.json'))throw new RuntimeException('Phantom Calendar recovery target is invalid.');
+spl_autoload_register(static function(string$class)use($root):void{if(str_starts_with($class,'App\\')){$file=$root.'/app/'.str_replace('\\','/',substr($class,4)).'.php';if(is_file($file))require_once$file;}});
+$config=(static fn(string$path):array=>require$path)($root.'/config/app.php');$db=(new App\Core\Database($config['database']))->connection();$row=$db->query("SELECT type,slug,version,package_checksum FROM extension_packages WHERE type='addon' AND slug='calendar'")->fetch(PDO::FETCH_ASSOC);$manifest=json_decode((string)file_get_contents($root.'/addons/calendar/addon.json'),true,32,JSON_THROW_ON_ERROR);
+$hash='b63ea96791becb74b654d09829d0f1a055049a5ec908f610c66671efef0f0ead';if(($row['version']??'')!=='1.1.3'||!hash_equals($hash,(string)($row['package_checksum']??''))||($manifest['version']??'')!=='1.1.3')throw new RuntimeException('Refusing to remove a Calendar release that is not the failed phantom installation.');
+$manager=new App\Core\PackageManager($db,$root,(string)$config['engine_version'],(array)$config['marketplace']);$result=$manager->uninstall('addon','calendar',0);if($manager->package('addon','calendar')!==null||is_dir($root.'/addons/calendar'))throw new RuntimeException('Phantom Calendar cleanup did not complete.');echo json_encode(['ok'=>true,'removed'=>$result],JSON_UNESCAPED_SLASHES|JSON_THROW_ON_ERROR).PHP_EOL;
