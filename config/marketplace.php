@@ -20,8 +20,8 @@ return [
     // Legacy license contract names are intentionally retained below as non-public compatibility identifiers.
     'packages' => [
         'b843df54f8988bad5b884f54dceb7250' => [
-            'type' => 'system', 'slug' => 'eduvixo-cms', 'name' => 'Base CMS', 'version' => '1.0.12', 'release_channel' => 'stable', 'size' => 10407331,
-            'file' => $packageRoot . '/eduvixo-install-1.0.12.zip', 'checksum' => '83896b2a4e0074b756472da3c5bb80f031b3f66d7daf3ef95a1de174804f70dc',
+            'type' => 'system', 'slug' => 'eduvixo-cms', 'name' => 'Base CMS', 'version' => '1.0.13', 'release_channel' => 'stable', 'size' => 10407500,
+            'file' => $packageRoot . '/eduvixo-install-1.0.13.zip', 'checksum' => '2149fb5d9d4a2fb3a2b63d9aa95b14b0906d0f47ac268cc3cce65032e4c8bca0',
             'browser_enabled' => false, 'license_download_enabled' => true, 'update_enabled' => false, 'icon' => 'layers', 'copy_key' => 'marketplace.system_copy',
             'meta_keys' => ['marketplace.cms_price'],
         ],
@@ -43,11 +43,11 @@ return [
             'license_product_name' => 'iFirewall', 'license_product_model' => 'PHP Security & IP Firewall', 'license_product_version' => '1.0.0',
         ],
         'd7a9559c60326f90ccf5fbda507c9b50' => [
-            'type' => 'addon', 'slug' => 'calendar', 'name' => 'My Calendar', 'version' => '1.1.4', 'release_channel' => 'stable', 'size' => 67012,
-            'file' => $packageRoot . '/eduvixo-calendar-1.1.4.zip', 'checksum' => '9ed90035ab72d5b5568bee03ce736714f3d6278374bce60f6c21b80bac49802c',
+            'type' => 'addon', 'slug' => 'calendar', 'name' => 'My Calendar', 'version' => '1.1.5', 'release_channel' => 'stable', 'size' => 67091,
+            'file' => $packageRoot . '/eduvixo-calendar-1.1.5.zip', 'checksum' => '283de002ea521f221fbfa8cb900601c4950029028a86a5a708cc958402ea024e',
             'browser_enabled' => false, 'license_download_enabled' => true, 'update_enabled' => true, 'system_installable' => true, 'icon' => 'calendar-days', 'copy_key' => 'marketplace.calendar_copy',
             'meta_keys' => ['marketplace.calendar_price'], 'card_class' => 'is-premium-plugin',
-            'license_product_name' => 'Eduvixo Calendar', 'license_product_model' => 'Education Scheduling & Notifications', 'license_product_version' => '1.1.4',
+            'license_product_name' => 'Eduvixo Calendar', 'license_product_model' => 'Education Scheduling & Notifications', 'license_product_version' => '1.1.5',
         ],
         '292dea9e61c2cc57d8f067d8b3f26a00' => [
             'type' => 'plugin', 'slug' => 'google-calendar', 'name' => 'Google Calendar', 'version' => '1.1.1', 'release_channel' => 'stable', 'size' => 3063,
