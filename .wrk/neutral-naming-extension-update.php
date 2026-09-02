@@ -12,7 +12,7 @@ $_SESSION=[];$manager=new App\Core\PackageManager($db,$root,(string)$config['eng
 $releases=[
     ['theme','eduvixo','1.1.10','eduvixo-theme-1.1.10.zip'],
     ['theme','shoudu','1.1.4','shoudu-theme-1.1.4.zip'],
-    ['addon','calendar','1.1.3','eduvixo-calendar-1.1.3.zip'],
+    ['addon','calendar','1.1.4','eduvixo-calendar-1.1.4.zip'],
     ['plugin','google-calendar','1.1.1','google-calendar-1.1.1.zip'],
     ['plugin','apple-calendar','1.1.1','apple-calendar-1.1.1.zip'],
     ['plugin','microsoft-365-calendar','1.1.1','microsoft-365-calendar-1.1.1.zip'],

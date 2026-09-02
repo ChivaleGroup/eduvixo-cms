@@ -1,4 +1,4 @@
-# My Calendar 1.1.3 - Telegram reminder format
+# My Calendar 1.1.4 - Telegram reminder format
 
 ## Scope
 
@@ -21,9 +21,9 @@ https://demo.eduvixo.com/calendar?event=123
 
 ## Release
 
-- Signed package: `eduvixo-calendar-1.1.3.zip`.
-- Size: 66,978 bytes.
-- SHA-256: `b63ea96791becb74b654d09829d0f1a055049a5ec908f610c66671efef0f0ead`.
+- Signed package: `eduvixo-calendar-1.1.4.zip`.
+- Size: 67,012 bytes.
+- SHA-256: `9ed90035ab72d5b5568bee03ce736714f3d6278374bce60f6c21b80bac49802c`.
 - Release channel: Stable.
 - Private source snapshot: `F:\Git\ChivaleGroup\.backups\my-calendar-1.1.3-telegram-reminder-source-20260902.tar.gz`.
 - Source snapshot SHA-256: `024b6f4394121d05f1f74b65ef89309983ffc0df606cc79dd34a0cdde5c0d542`.
@@ -45,3 +45,13 @@ https://demo.eduvixo.com/calendar?event=123
 - Production postcheck passed nine assertions: package/config/catalog identity, demo release state, deployed formatter, clean Shoudu state and three HTTP routes.
 - Apache configuration is valid; Apache and PHP 8.4 FPM are active; recent website and demo logs contain zero critical PHP errors.
 - No live test notification was generated, so the next naturally scheduled Telegram reminder will provide the final end-to-end presentation check without adding artificial Calendar data.
+
+## Internal plus Telegram correction
+
+- A real reminder revealed that 1.1.3 still used the legacy layout when `Internal` and `Telegram` were selected together. The internal reminder inserted an unrestricted system event first; Telegram then reused its deduplication key and retained the earlier generic payload.
+- Version 1.1.4 keeps internal Calendar notifications in `calendar_notifications` only and creates the external event exclusively for the explicitly selected Telegram channel. The channel-specific payload can no longer be overwritten by the internal path.
+- The isolated integration test now selects `Internal` and `Telegram` together and verifies the exact Telegram title, description, blank lines, IANA time zone and channel restriction.
+- Production recovery point: `/root/eduvixo-backups/calendar-telegram-reminder-pre-20260902-035613`.
+- Demo is active on signature-verified My Calendar 1.1.4; Shoudu remains without the add-on. The signed Marketplace catalogue and package identify the same 1.1.4 checksum.
+- Private 1.1.4 source snapshot: `F:\Git\ChivaleGroup\.backups\my-calendar-1.1.4-telegram-reminder-source-20260902.tar.gz`, SHA-256 `f998e993b00d65b415f00b4b3919e70b3cf6fc481463c890c76683eb4dec02c6`.
+- After deployment there were zero unprocessed Calendar events, zero pending Calendar provider deliveries and zero overdue reminder jobs, so no legacy queued payload remains to be delivered.
