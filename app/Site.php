@@ -76,6 +76,12 @@ final class Site
         if ($path === '/api/integrations/whatsapp/onboarding/complete') $this->whatsappComplete();
         if ($path === '/api/integrations/whatsapp/onboarding/claim') $this->whatsappClaim();
         if ($path === '/api/integrations/whatsapp/webhook') $this->whatsappWebhook();
+        if ($path === '/api/integrations/telegram/connect/start') $this->telegramStart();
+        if ($path === '/api/integrations/telegram/connect/status') $this->telegramStatus();
+        if ($path === '/api/integrations/telegram/connect/disconnect') $this->telegramDisconnect();
+        if ($path === '/api/integrations/telegram/recipients') $this->telegramRecipients();
+        if ($path === '/api/integrations/telegram/deliver') $this->telegramDeliver();
+        if ($path === '/api/integrations/telegram/webhook') $this->telegramWebhook();
         $segments = array_values(array_filter(explode('/', trim($this->requestPath(), '/')), static fn(string $segment): bool => $segment !== ''));
         if ($segments && isset($this->config['languages'][strtolower($segments[0])])) array_shift($segments);
         $slug = implode('/', $segments); $page = array_search($slug, self::PAGE_ROUTES, true);
@@ -138,6 +144,19 @@ final class Site
             $broker->acceptWebhook((string) file_get_contents('php://input'), (string) ($_SERVER['HTTP_X_HUB_SIGNATURE_256'] ?? ''));
             http_response_code(200); header('Content-Type: text/plain; charset=utf-8'); header('Cache-Control: no-store'); echo 'EVENT_RECEIVED'; exit;
         } catch (\RuntimeException $error) { $this->plain($error->getMessage(), $this->errorStatus($error)); }
+    }
+
+    public function telegramStart(): never { $this->telegramAction(fn(TelegramBrokerService$service,array$input):array=>$service->start($_SERVER,$input)); }
+    public function telegramStatus(): never { $this->telegramAction(fn(TelegramBrokerService$service,array$input):array=>$service->status($_SERVER,$input)); }
+    public function telegramDisconnect(): never { $this->telegramAction(fn(TelegramBrokerService$service,array$input):array=>$service->disconnect($_SERVER,$input)); }
+    public function telegramRecipients(): never { $this->telegramAction(fn(TelegramBrokerService$service,array$input):array=>$service->recipients($_SERVER)); }
+    public function telegramDeliver(): never { $this->telegramAction(fn(TelegramBrokerService$service,array$input):array=>$service->deliver($_SERVER,$input)); }
+
+    public function telegramWebhook(): never
+    {
+        if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') $this->methodNotAllowed(['POST']);
+        try { $this->telegramBroker()->acceptWebhook((string) file_get_contents('php://input'), (string) ($_SERVER['HTTP_X_TELEGRAM_BOT_API_SECRET_TOKEN'] ?? '')); http_response_code(200); header('Content-Type: application/json; charset=utf-8'); header('Cache-Control: no-store'); echo '{"ok":true}'; exit; }
+        catch (\RuntimeException $error) { $this->jsonError($error->getMessage(), $this->errorStatus($error)); }
     }
 
     public function contact(): never
@@ -463,6 +482,19 @@ final class Site
         return new WhatsAppOnboardingService($meta, ['endpoint' => (string) ($this->config['marketplace']['license_endpoint'] ?? '')], (string) $this->config['base_url'], (string) ($meta['key'] ?? ''));
     }
 
+    private function telegramBroker(): TelegramBrokerService
+    {
+        require_once __DIR__ . '/TelegramBrokerService.php'; $telegram = (array) ($this->config['telegram_broker'] ?? []);
+        return new TelegramBrokerService($telegram, ['endpoint' => (string) ($this->config['marketplace']['license_endpoint'] ?? '')], (string) ($telegram['key'] ?? ''));
+    }
+
+    private function telegramAction(\Closure $action): never
+    {
+        if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') $this->methodNotAllowed(['POST']);
+        try { $this->json($action($this->telegramBroker(), $this->jsonInput())); }
+        catch (\RuntimeException $error) { $this->jsonError($error->getMessage(), $this->errorStatus($error)); }
+    }
+
     private function jsonInput(): array
     {
         if (!str_contains(strtolower((string) ($_SERVER['CONTENT_TYPE'] ?? '')), 'application/json')) throw new \RuntimeException('JSON request required.', 415);
@@ -474,7 +506,7 @@ final class Site
         return $input;
     }
 
-    private function errorStatus(\RuntimeException $error): int { return in_array($error->getCode(), [400, 401, 403, 404, 405, 410, 413, 415, 422, 429, 502, 503], true) ? $error->getCode() : 500; }
+    private function errorStatus(\RuntimeException $error): int { return in_array($error->getCode(), [400, 401, 403, 404, 405, 409, 410, 413, 415, 422, 429, 502, 503], true) ? $error->getCode() : 500; }
 
     private function json(array $data): never { header('Content-Type: application/json; charset=utf-8'); header('Cache-Control: no-store'); header('X-Robots-Tag: noindex, nofollow, noarchive'); echo json_encode($data, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES); exit; }
     private function jsonError(string $message, int $status, array $details = []): never { http_response_code($status); $this->json(['error' => true, 'message' => $message] + $details); }

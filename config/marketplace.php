@@ -20,8 +20,8 @@ return [
     // Legacy license contract names are intentionally retained below as non-public compatibility identifiers.
     'packages' => [
         'b843df54f8988bad5b884f54dceb7250' => [
-            'type' => 'system', 'slug' => 'eduvixo-cms', 'name' => 'Base CMS', 'version' => '1.0.15', 'release_channel' => 'stable', 'size' => 10412005,
-            'file' => $packageRoot . '/eduvixo-install-1.0.15.zip', 'checksum' => 'a48ded78628a8a431dc691a2f3993c7712155359dfb956924f670d9ad8539717',
+            'type' => 'system', 'slug' => 'eduvixo-cms', 'name' => 'Base CMS', 'version' => '1.0.16', 'release_channel' => 'stable', 'size' => 10426263,
+            'file' => $packageRoot . '/eduvixo-install-1.0.16.zip', 'checksum' => '0005cc400518596a775c067cae5844a51e01719f7a7f98562549b9a4c8987b2b',
             'browser_enabled' => false, 'license_download_enabled' => true, 'update_enabled' => false, 'icon' => 'layers', 'copy_key' => 'marketplace.system_copy',
             'meta_keys' => ['marketplace.cms_price'],
         ],
@@ -68,10 +68,10 @@ return [
             'meta_keys' => ['marketplace.integration_price', 'marketplace.requires_calendar'], 'license_product_name' => 'Microsoft 365 Calendar for Eduvixo', 'license_product_model' => 'Calendar Integration', 'license_product_version' => '1.1.0',
         ],
         '40845422103c0ed50f9e7bdc6df97400' => [
-            'type' => 'plugin', 'slug' => 'telegram-notifications', 'name' => 'Telegram Notifications', 'version' => '1.1.0-beta.1', 'release_channel' => 'beta', 'size' => 3944,
-            'file' => $packageRoot . '/telegram-notifications-1.1.0-beta.1.zip', 'checksum' => 'e74c1233875ba954e4d2d78bc7bd23475daeeb9985b454b57f82dc2d8150c489',
+            'type' => 'plugin', 'slug' => 'telegram-notifications', 'name' => 'Telegram Notifications', 'version' => '1.2.0-beta.1', 'release_channel' => 'beta', 'size' => 3904,
+            'file' => $packageRoot . '/telegram-notifications-1.2.0-beta.1.zip', 'checksum' => '1bd6d4ee66473d3857e81791fb70a0fa9d710647c5cd77361b92138d43f2b94c',
             'browser_enabled' => false, 'license_download_enabled' => true, 'update_enabled' => true, 'system_installable' => true, 'icon' => 'send', 'copy_key' => 'marketplace.telegram_copy',
-            'meta_keys' => ['marketplace.notification_price', 'marketplace.system_notifications'], 'license_product_name' => 'Telegram Notifications for Eduvixo', 'license_product_model' => 'Calendar Notification Integration', 'license_product_version' => '1.0.0',
+            'meta_keys' => ['marketplace.notification_price', 'marketplace.system_notifications'], 'license_product_name' => 'Telegram Notifications', 'license_product_model' => 'System and Calendar Notification Integration', 'license_product_version' => '1.2.0-beta.1',
         ],
         '854d28de19fe0025dc1f786786720529' => [
             'type' => 'plugin', 'slug' => 'whatsapp-notifications', 'name' => 'WhatsApp Notifications', 'version' => '1.1.0-beta.2', 'release_channel' => 'beta', 'size' => 3505,

@@ -3,6 +3,7 @@
 !.env.example
 .cfg/*
 !.cfg/README.md
+.backups/
 .cms/
 .doc/
 .plugins/

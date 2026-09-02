@@ -41,6 +41,25 @@ if ($whatsappKey === '') {
     $whatsappKey = is_file($secretPath) ? trim((string) file_get_contents($secretPath)) : '';
 }
 if (!preg_match('/^[A-Fa-f0-9]{64}$/D', $whatsappKey)) throw new RuntimeException('SITE_WHATSAPP_BROKER_KEY must contain 64 hexadecimal characters.');
+$telegramKey = trim($env('SITE_TELEGRAM_BROKER_KEY'));
+if ($telegramKey === '') {
+    $secretPath = $root . '/storage/.telegram-broker-key';
+    if (!is_file($secretPath)) {
+        $directory = dirname($secretPath);
+        if (!is_dir($directory) && !mkdir($directory, 0750, true) && !is_dir($directory)) throw new RuntimeException('Secure Telegram connection storage is unavailable.');
+        $candidate = bin2hex(random_bytes(32)); $handle = @fopen($secretPath, 'x');
+        if (is_resource($handle)) { try { if (fwrite($handle, $candidate) !== strlen($candidate) || !fflush($handle)) throw new RuntimeException('Telegram connection key could not be persisted.'); } finally { fclose($handle); } @chmod($secretPath, 0640); }
+    }
+    $telegramKey = is_file($secretPath) ? trim((string) file_get_contents($secretPath)) : '';
+}
+if (!preg_match('/^[A-Fa-f0-9]{64}$/D', $telegramKey)) throw new RuntimeException('SITE_TELEGRAM_BROKER_KEY must contain 64 hexadecimal characters.');
+$telegramWebhookSecret = trim($env('SITE_TELEGRAM_WEBHOOK_SECRET'));
+if ($telegramWebhookSecret === '') {
+    $secretPath = $root . '/storage/.telegram-webhook-secret';
+    if (!is_file($secretPath)) { $candidate = rtrim(strtr(base64_encode(random_bytes(32)), '+/', '-_'), '='); $handle = @fopen($secretPath, 'x'); if (is_resource($handle)) { try { if (fwrite($handle, $candidate) !== strlen($candidate) || !fflush($handle)) throw new RuntimeException('Telegram webhook secret could not be persisted.'); } finally { fclose($handle); } @chmod($secretPath, 0640); } }
+    $telegramWebhookSecret = is_file($secretPath) ? trim((string) file_get_contents($secretPath)) : '';
+}
+if (!preg_match('/^[A-Za-z0-9_-]{32,256}$/D', $telegramWebhookSecret)) throw new RuntimeException('SITE_TELEGRAM_WEBHOOK_SECRET is invalid.');
 
 return [
     'root' => $root,
@@ -57,6 +76,13 @@ return [
         'webhook_token' => $env('SITE_META_WHATSAPP_WEBHOOK_TOKEN'),
         'storage' => $root . '/storage/whatsapp-onboarding',
         'key' => strtolower($whatsappKey),
+    ],
+    'telegram_broker' => [
+        'bot_token' => $env('SITE_TELEGRAM_BOT_TOKEN'),
+        'bot_username' => $env('SITE_TELEGRAM_BOT_USERNAME', 'EduvixoNotificationsBot'),
+        'webhook_secret' => $telegramWebhookSecret,
+        'storage' => $root . '/storage/telegram-broker',
+        'key' => strtolower($telegramKey),
     ],
     'marketplace' => require __DIR__ . '/marketplace.php',
     'languages' => [
