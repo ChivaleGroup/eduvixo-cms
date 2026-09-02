@@ -27,6 +27,10 @@
 - Live browser QA confirmed new-user selection, persisted edit state, E-mail settings and public password recovery.
 - Apache configuration is valid; Apache, PHP-FPM, MariaDB and cron are active; no new critical PHP-FPM events were found.
 
+## Infrastructure limitation
+
+The production host cannot currently open outbound TCP connections to the configured mail host on ports 25, 465, 587 or 2525. Its local OUTPUT policy is permissive and HTTPS egress works; the SMTP endpoint is reachable from an independent network. This identifies an upstream hosting-provider SMTP egress block rather than an application or mail-server failure. Configuration remains encrypted and ready, and account creation degrades safely with a clear invitation-delivery warning until outbound SMTP is enabled or an HTTPS mail provider is configured.
+
 ## Rollback
 
 Prefer the per-installation Core recovery point for a Core-only rollback. Use the full backup directory above when database, theme, Marketplace and filesystem restoration must be coordinated.
