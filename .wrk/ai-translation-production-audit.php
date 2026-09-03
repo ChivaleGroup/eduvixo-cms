@@ -12,17 +12,17 @@ $request = static function (string $url): array {
     if (!is_string($response) || $error !== '') throw new RuntimeException('HTTP request failed: ' . $url);
     return [$status, substr($response, 0, $headerSize), substr($response, $headerSize)];
 };
-$packageName = 'ai-translation-assistant-1.0.0-beta.1.zip'; $package = $web . '/storage/marketplace/packages/' . $packageName;
-$assert(is_file($package) && filesize($package) === 15628 && hash_equals('d82f312c24037509814323371ce63dd52cd9037e4ed2a347d67f9a98c4ca7c72', hash_file('sha256', $package)), 'signed AI Translation package integrity');
+$packageName = 'ai-translation-assistant-1.0.1.zip'; $package = $web . '/storage/marketplace/packages/' . $packageName;
+$assert(is_file($package) && filesize($package) === 16810 && hash_equals('bbc4340e8fcf883c727bbcc8474f0a2b96bef573b67002ed865c7065a9ed7f83', hash_file('sha256', $package)), 'signed AI Translation package integrity');
 $assert((fileperms($package) & 0777) === 0640 && fileowner($package) === fileowner($web . '/public/index.php'), 'private package permissions and owner');
-[$status] = $request($base . '/storage/marketplace/packages/' . $packageName); $assert($status === 403, 'direct package URL denied');
+[$status] = $request($base . '/storage/marketplace/packages/' . $packageName); $assert(in_array($status, [403, 404], true), 'direct package URL denied without disclosure');
 [$status, , $rawCatalog] = $request($base . '/api/marketplace/v1/official/');
 $document = json_decode($rawCatalog, true, 8, JSON_THROW_ON_ERROR); $payload = base64_decode((string) ($document['signed_payload'] ?? ''), true); $signature = base64_decode((string) ($document['signature'] ?? ''), true); $public = base64_decode('q+WweIoNkskiUOzyLl80Bc9V2TkBdHXXrtOufSRIg54=', true);
 $assert($status === 200 && is_string($payload) && is_string($signature) && is_string($public) && sodium_crypto_sign_verify_detached($signature, $payload, $public), 'official catalog endpoint and signature');
 $catalog = json_decode($payload, true, 64, JSON_THROW_ON_ERROR); $products = (array) ($catalog['products'] ?? []);
 $translation = array_values(array_filter($products, static fn(array $product): bool => ($product['name'] ?? '') === 'AI Translation Assistant'));
 $assert(count($products) === 13 && count($translation) === 1 && !empty($translation[0]['licensed']), '13-product catalog with licensed AI Translation entry');
-$assert(($translation[0]['copy']['en']['meta'][0] ?? '') === 'Free' && ($translation[0]['channel'] ?? '') === 'beta', 'Free Beta catalog metadata');
+$assert(($translation[0]['copy']['en']['meta'][0] ?? '') === 'Free' && ($translation[0]['channel'] ?? '') === 'stable' && ($translation[0]['version'] ?? '') === '1.0.1', 'Free Stable catalog metadata');
 foreach (['en', 'de', 'zh', 'vi', 'th', 'lo', 'pl'] as $locale) {
     [$status, , $page] = $request($base . '/' . $locale . '/marketplace/');
     $assert($status === 200 && substr_count($page, 'id="package-') === 13, 'Marketplace product count: ' . $locale);

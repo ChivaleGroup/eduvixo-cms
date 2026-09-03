@@ -86,8 +86,8 @@ return [
             'license_product_name' => 'Google Analytics for Eduvixo', 'license_product_model' => 'Web Analytics Integration', 'license_product_version' => '1.0.0',
         ],
         'ab80e3241f74ffa8f0d554f6ddf2b47a' => [
-            'type' => 'plugin', 'slug' => 'ai-translation-assistant', 'name' => 'AI Translation Assistant', 'version' => '1.0.0-beta.2', 'release_channel' => 'beta', 'size' => 15640,
-            'file' => $packageRoot . '/ai-translation-assistant-1.0.0-beta.2.zip', 'checksum' => '882bc1b884a956f510e7fd14a8a3befca1c46334cb0c78521fb6782294f98b25',
+            'type' => 'plugin', 'slug' => 'ai-translation-assistant', 'name' => 'AI Translation Assistant', 'version' => '1.0.1', 'release_channel' => 'stable', 'size' => 16810,
+            'file' => $packageRoot . '/ai-translation-assistant-1.0.1.zip', 'checksum' => 'bbc4340e8fcf883c727bbcc8474f0a2b96bef573b67002ed865c7065a9ed7f83',
             'browser_enabled' => false, 'license_download_enabled' => true, 'update_enabled' => true, 'system_installable' => true, 'icon' => 'languages', 'copy_key' => 'marketplace.ai_translation_copy',
             'license_product_name' => 'AI Translation Assistant', 'license_product_model' => 'AI-Assisted Multilingual Content', 'license_product_version' => '1.0.0',
         ],

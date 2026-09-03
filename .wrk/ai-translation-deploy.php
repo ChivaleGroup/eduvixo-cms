@@ -8,7 +8,7 @@ $stage = '/root/eduvixo-deploy/ai-translation-' . $stamp;
 $archive = '/root/eduvixo-deploy/ai-translation-release.tar.gz';
 $web = '/var/www/clients/client9/web123/web';
 $owner = 'web123'; $group = 'client9';
-$packageName = 'ai-translation-assistant-1.0.0-beta.1.zip';
+$packageName = 'ai-translation-assistant-1.0.1.zip';
 $files = [
     'config/marketplace.php',
     'lang/de.json', 'lang/en.json', 'lang/lo.json', 'lang/pl.json', 'lang/th.json', 'lang/vi.json', 'lang/zh.json',
@@ -46,13 +46,13 @@ foreach (glob($stage . '/lang/*.json') ?: [] as $language) {
     if (trim((string) ($copyData['marketplace']['ai_translation_copy'] ?? '')) === '') throw new RuntimeException('Missing localized AI Translation copy.');
 }
 $package = $stage . '/storage/marketplace/packages/' . $packageName;
-if (filesize($package) !== 15628 || !hash_equals('d82f312c24037509814323371ce63dd52cd9037e4ed2a347d67f9a98c4ca7c72', hash_file('sha256', $package))) throw new RuntimeException('AI Translation package integrity failure.');
+if (filesize($package) !== 16810 || !hash_equals('bbc4340e8fcf883c727bbcc8474f0a2b96bef573b67002ed865c7065a9ed7f83', hash_file('sha256', $package))) throw new RuntimeException('AI Translation package integrity failure.');
 $zip = new ZipArchive();
 if ($zip->open($package, ZipArchive::RDONLY) !== true) throw new RuntimeException('AI Translation package is unreadable.');
 $raw = $zip->getFromName('eduvixo-package.json'); $signature = base64_decode((string) $zip->getFromName('signature.ed25519'), true); $public = base64_decode('q+WweIoNkskiUOzyLl80Bc9V2TkBdHXXrtOufSRIg54=', true);
 if (!is_string($raw) || !is_string($signature) || !is_string($public) || !sodium_crypto_sign_verify_detached($signature, $raw, $public)) throw new RuntimeException('AI Translation publisher signature failure.');
 $manifest = json_decode($raw, true, 64, JSON_THROW_ON_ERROR);
-if (($manifest['slug'] ?? '') !== 'ai-translation-assistant' || ($manifest['version'] ?? '') !== '1.0.0-beta.1' || ($manifest['license']['model'] ?? '') !== 'free') throw new RuntimeException('AI Translation package identity failure.');
+if (($manifest['slug'] ?? '') !== 'ai-translation-assistant' || ($manifest['version'] ?? '') !== '1.0.1' || ($manifest['release_channel'] ?? '') !== 'stable' || ($manifest['license']['model'] ?? '') !== 'free') throw new RuntimeException('AI Translation package identity failure.');
 foreach ((array) ($manifest['files'] ?? []) as $file => $hash) { $content = $zip->getFromName('payload/' . $file); if (!is_string($content) || !hash_equals((string) $hash, hash('sha256', $content))) throw new RuntimeException('AI Translation payload integrity failure.'); }
 $zip->close();
 $catalogDocument = json_decode((string) file_get_contents($stage . '/storage/marketplace/official-catalog.json'), true, 8, JSON_THROW_ON_ERROR);

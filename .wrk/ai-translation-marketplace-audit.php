@@ -12,7 +12,7 @@ $products = (array) ($marketplace['packages'] ?? []);
 $matches = array_filter($products, static fn(array $item): bool => ($item['slug'] ?? '') === 'ai-translation-assistant');
 $assert(count($products) === 13 && count($matches) === 1, '13-product Marketplace includes one AI Translation Assistant');
 $product = reset($matches);
-$assert(($product['version'] ?? '') === '1.0.0-beta.1' && ($product['release_channel'] ?? '') === 'beta', 'AI Translation Assistant Beta version');
+$assert(($product['version'] ?? '') === '1.0.1' && ($product['release_channel'] ?? '') === 'stable', 'AI Translation Assistant Stable version');
 $assert(!empty($product['license_download_enabled']) && empty($product['browser_enabled']) && empty($product['meta_keys']), 'free product uses protected licensed download');
 
 $fileCount = 0;
@@ -36,7 +36,7 @@ $manifest = is_string($raw) ? json_decode($raw, true, 64, JSON_THROW_ON_ERROR) :
 $key = json_decode((string) file_get_contents($root . '/.cfg/marketplace-signing-key.json'), true, 16, JSON_THROW_ON_ERROR);
 $public = base64_decode((string) ($key['public_key'] ?? ''), true);
 $assert(is_string($raw) && is_string($signature) && is_string($public) && sodium_crypto_sign_verify_detached(base64_decode($signature, true), $raw, $public), 'publisher signature verifies');
-$assert(($manifest['slug'] ?? '') === 'ai-translation-assistant' && ($manifest['version'] ?? '') === '1.0.0-beta.1' && ($manifest['release_channel'] ?? '') === 'beta', 'signed manifest identity');
+$assert(($manifest['slug'] ?? '') === 'ai-translation-assistant' && ($manifest['version'] ?? '') === '1.0.1' && ($manifest['release_channel'] ?? '') === 'stable', 'signed manifest identity');
 $assert(($manifest['license']['model'] ?? '') === 'free' && (float) ($manifest['license']['price'] ?? -1) === 0.0, 'signed manifest declares Free license');
 $assert(count((array) ($manifest['files'] ?? [])) === 7, 'signed payload contains seven expected files');
 foreach ((array) ($manifest['files'] ?? []) as $relative => $checksum) {
